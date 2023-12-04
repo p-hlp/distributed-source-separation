@@ -1,30 +1,30 @@
-# React + TypeScript + Vite
+# Distributed Source Separation & Sampling
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This projects aims to provide a platform to manage music, stems and samples by providing the following features:
 
-Currently, two official plugins are available:
+- Source Separation / Stemming (Vocals/Melodic/Bass/Drums)
+- Automatic Sample Slicing
+- Automatic Sample Classification / Tagging
+- Audio to Midi
+- Export to separate VST3/CLAP plugin for easier sample browsing within your DAW
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Used Technologies
 
-## Expanding the ESLint configuration
+## Frontend
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- React / Vite / Typescript
+- ShadCN & Tailwind.css for styling
 
-- Configure the top-level `parserOptions` property like this:
+## Backend
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+### Authentication / Authorization
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Auth0 is used with a OAuth2 PKCE Authorization Flow.
+
+### API
+
+- Node.js / Express API
+
+### Audio Processing Service
+
+- Python with Rust interop.
