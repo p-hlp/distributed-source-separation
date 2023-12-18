@@ -9,7 +9,7 @@
 - (Building / training) Neural Networks for Audio (Classification task)
 - From a non-technical standpoint, sampling has been at the core of genre innovation
   - Having access to individual musical parts aids in the creative process of re-envisioning an original piece of music
-  - Not only in terms of remixing/bootlegging, but also when mixing entire genres it expands the creative possibilities
+  - Not only in terms of remixing/bootlegging, but also simply having access to parts of different musical elements of existing songs can spark inspiration for artists
 
 ## Features and Project-Scope
 
