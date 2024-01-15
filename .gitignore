@@ -30,3 +30,7 @@ dist-ssr
 .env.test.local
 .env.production.local
 
+# python
+*.pyc
+__pycache__/
+
