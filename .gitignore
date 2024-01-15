@@ -30,3 +30,12 @@ dist-ssr
 .env.test.local
 .env.production.local
 
+# python
+*.pyc
+__pycache__/
+
+# media files
+tracks
+stems
+*.mp3
+*.wav
