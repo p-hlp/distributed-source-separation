@@ -34,3 +34,8 @@ dist-ssr
 *.pyc
 __pycache__/
 
+# media files
+tracks
+stems
+*.mp3
+*.wav
