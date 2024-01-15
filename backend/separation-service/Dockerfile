@@ -1,24 +1,13 @@
-# Start from the NVIDIA CUDA base image
-FROM nvidia/cuda:12.2.2-base-ubuntu22.04
+FROM pytorch/pytorch:2.1.2-cuda12.1-cudnn8-runtime
 
-# Set any environment variables
-ENV TEST=TEST123
+WORKDIR /code 
 
-RUN apt-get update && \
-    apt-get install -y \
-        git \
-        python3-pip \
-        python3-dev \
-        libglib2.0-0
+COPY requirements.txt /code/requirements.txt
 
-COPY requirements.txt requirements.txt
+RUN python3 -m pip install -r /code/requirements.txt
 
-RUN python3 -m pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
-RUN python3 -m pip install --upgrade pip
+COPY ./app /code/app
 
-RUN pip3 install torch torchvision torchaudio -f https://download.pytorch.org/whl/cu111/torch_stable.html
-
-WORKDIR /app
-
-ENTRYPOINT [ "python3" ]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -2,8 +2,11 @@ version: "3"
 
 services:
   test:
-    image: nvidia/cuda:12.1.1-base-ubuntu22.04
-    command: nvidia-smi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
     deploy:
       resources:
         reservations:
