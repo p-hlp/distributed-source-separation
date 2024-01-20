@@ -2,4 +2,4 @@
 
 ## How to use
 
-start appliation - `uvicorn app.main:app --reload`
+start appliation - `uvicorn app.main:app --reload --port 8000`

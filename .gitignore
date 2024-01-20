@@ -35,6 +35,8 @@ dist-ssr
 __pycache__/
 
 # media files
+backend/file-db/*
+!backend/file-db/.gitkeep
 tracks
 stems
 *.mp3
