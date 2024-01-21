@@ -1,14 +1,21 @@
 import dotenv from "dotenv";
-import express, { Express, Request, Response } from "express";
-
 dotenv.config();
+dotenv.config({ path: ".env.local" });
 
-const app: Express = express();
+import cors from "cors";
+import express, { Express } from "express";
+import { registerApiRoutes } from "./api";
+import { authenticate } from "./middleware/authenticate.middleware";
+import helmet from "helmet";
+
 const port = process.env.PORT;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!");
-});
+const app: Express = express();
+app.use(cors());
+app.use(helmet());
+app.use(authenticate);
+
+registerApiRoutes(app);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

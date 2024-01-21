@@ -9,10 +9,14 @@
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
   },
   "dependencies": {
+    "cors": "2.8.5",
     "dotenv": "16.3.1",
-    "express": "4.18.2"
+    "express": "4.18.2",
+    "express-oauth2-jwt-bearer": "1.6.0",
+    "helmet": "7.1.0"
   },
   "devDependencies": {
+    "@types/cors": "2.8.17",
     "@types/express": "4.17.21",
     "@types/node": "20.11.0",
     "concurrently": "8.2.2",
