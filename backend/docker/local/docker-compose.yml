@@ -1,0 +1,39 @@
+# compose file for defining redis-stack service
+version: "3"
+
+services:
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - 6379:6379
+      - 8001:8001
+    volumes:
+      - ~/redis_data:/data
+  minio:
+    image: minio/minio
+    volumes:
+      - ~/minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+    command: server /data --console-address ":9001"
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}}
+    volumes:
+      - ~/postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+volumes:
+  redis-data:
+  minio_data:
+  postgres_data:
