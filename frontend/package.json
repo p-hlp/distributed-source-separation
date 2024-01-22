@@ -21,7 +21,7 @@
     "axios": "1.6.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "wavesurfer.js": "7.6.4"
+    "wavesurfer.js": "7.6.5"
   },
   "devDependencies": {
     "@types/react": "18.2.47",
