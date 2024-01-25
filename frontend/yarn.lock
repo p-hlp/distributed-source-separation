@@ -2188,10 +2188,10 @@ vite@5.0.12:
   optionalDependencies:
     fsevents "~2.3.3"
 
-wavesurfer.js@7.6.5:
-  version "7.6.5"
-  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-7.6.5.tgz#7d9df410507f46de4eb4b09e3b3284f0c30bb41f"
-  integrity sha512-N3VjoD01i99g8zRY8TbZTZakpV+ZYlbdXX09M7NIrEXYjcWXh91MIuAczKa5LOUetz/B52Ly/glKNH2WUY4UWA==
+wavesurfer.js@7.7.0:
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/wavesurfer.js/-/wavesurfer.js-7.7.0.tgz#2d685bd2d9ee984494fb23b4f9fbe54f45114de6"
+  integrity sha512-TJSQFjswhzmfnuIvjBKVleSue4z6MTMyo4MpyGWkDT4VyLw2PAcxR+klwCnTMF+ZHkJZoNz5peyq0hLqrraN1Q==
 
 which@^2.0.1:
   version "2.0.2"
