@@ -36,7 +36,11 @@ processQueueEvents.on("completed", (result) => {
 app.post("/queue", async (req, res) => {
   const userId = req.auth?.payload?.sub ?? "";
   const job = await processQueue.add("processData", req.body);
-  res.status(200).send({ message: "Data added to queue", jobId: job.id });
+  res.status(200).json({ message: "Data added to queue", jobId: job.id });
+});
+
+app.get("/", async (req, res) => {
+  res.status(200).json({ message: "Hello world" });
 });
 
 app.listen(port, () => {
