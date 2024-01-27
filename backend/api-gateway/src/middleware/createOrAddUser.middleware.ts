@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib";
 
 const createUser = async (auth0Id: string) => {
   return await prisma.user.create({
@@ -25,13 +25,11 @@ export const createOrAddUser = async (
     if (!auth0Id) return res.status(401).send("Unauthorized");
 
     const user = await getUser(auth0Id);
-    console.log("trying to find user", user);
     if (user) {
       req.user = user; // Attach user to the request object
       next();
     } else {
       const newUser = await createUser(auth0Id);
-      console.log("new user", newUser);
       req.user = newUser; // Attach user to the request object
       next();
     }
