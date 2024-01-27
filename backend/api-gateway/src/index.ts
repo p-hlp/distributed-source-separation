@@ -7,8 +7,11 @@ import { Queue, QueueEvents } from "bullmq";
 import cors from "cors";
 import express, { Express, Request, Response } from "express";
 import helmet from "helmet";
-import { initMinioDefaultBucket } from "./lib/minio";
+import { v4 as uuid } from "uuid";
+import { prisma } from "./lib";
+import { initMinioDefaultBucket, minioClient } from "./lib/minio";
 import { authenticate, createOrAddUser } from "./middleware";
+import { RawFile, parseMultipartReq } from "./shared/httpUtils";
 import { processQueueName } from "./types";
 
 const port = process.env.PORT;
@@ -38,7 +41,47 @@ const startUp = async () => {
   });
 
   app.post("/upload", async (req: Request, res: Response) => {
-    // Accepts audio files (.wav/.mp3) and uploads to Minio object storage and returns url to file storage
+    const user = req.user;
+    if (!user) return res.status(401).send("Unauthorized");
+    if (!req.body) res.status(400).json({ message: "No data to upload" });
+
+    const rawFile: RawFile = (await parseMultipartReq(req))[0];
+    const objectKey = uuid();
+    const fileName = `${user.id}/${objectKey}`;
+    const response = await minioClient.putObject(
+      process.env.MINIO_DEFAULT_BUCKET || "audio",
+      fileName,
+      rawFile.data,
+      undefined
+    );
+    if (response instanceof Error) {
+      return res.status(500).json({ message: "Error uploading file" });
+    }
+
+    // store file with information and user association
+    const audio = await prisma.audioFile.create({
+      data: {
+        name: rawFile.info.filename,
+        filePath: fileName,
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+      },
+    });
+    res.status(200).json({ audio });
+  });
+
+  app.get("/files", async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) return res.status(401).send("Unauthorized");
+    const files = await prisma.audioFile.findMany({
+      where: {
+        userId: user.id,
+      },
+    });
+    res.status(200).json({ files });
   });
 
   app.post("/queue", async (req: Request, res: Response) => {
