@@ -84,6 +84,27 @@ const startUp = async () => {
     res.status(200).json({ files });
   });
 
+  app.delete("/files/:id", async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) return res.status(401).send("Unauthorized");
+    const id = req.params.id;
+    const audio = await prisma.audioFile.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!audio) return res.status(404).json({ message: "File not found" });
+    if (audio.userId !== user.id)
+      return res.status(401).json({ message: "Unauthorized" });
+
+    await prisma.audioFile.delete({
+      where: {
+        id,
+      },
+    });
+    res.status(200).json({ id, message: "File deleted" });
+  });
+
   app.post("/queue", async (req: Request, res: Response) => {
     const jobPayload = {
       user: req.user,
