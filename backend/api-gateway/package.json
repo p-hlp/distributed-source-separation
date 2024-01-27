@@ -9,6 +9,7 @@
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\""
   },
   "dependencies": {
+    "@prisma/client": "5.8.1",
     "auth0": "4.2.0",
     "axios": "1.6.5",
     "bullmq": "5.1.4",
@@ -24,6 +25,7 @@
     "@types/node": "20.11.0",
     "concurrently": "8.2.2",
     "nodemon": "3.0.2",
+    "prisma": "5.8.1",
     "typescript": "5.3.3"
   }
 }

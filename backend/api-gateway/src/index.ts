@@ -8,6 +8,7 @@ import cors from "cors";
 import express, { Express } from "express";
 import helmet from "helmet";
 import { authenticate } from "./middleware/authenticate.middleware";
+import { createOrAddUser } from "./middleware/createOrAddUser.middleware";
 import { processQueueName } from "./types";
 
 const port = process.env.PORT;
@@ -24,7 +25,7 @@ app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(authenticate);
-
+app.use(createOrAddUser);
 // registerApiRoutes(app);
 
 processQueueEvents.on("completed", (result) => {
