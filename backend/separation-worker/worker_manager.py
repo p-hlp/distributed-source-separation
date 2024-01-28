@@ -16,8 +16,8 @@ class WorkerManager:
         # https://docs.bullmq.io/bull/important-notes
         self.opts = {
             "connection": f"redis://{redis_host}:{redis_port}",
-            "stalledInterval": 120000,  # 120 seconds
-            # "lockDuration": 120000,  # 120 seconds
+            "stalledInterval": 60000,  # 60 seconds
+            "lockDuration": 60000,  # 60 seconds
         }
         self.worker = None
 
