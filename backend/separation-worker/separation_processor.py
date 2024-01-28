@@ -123,9 +123,12 @@ class SeparationProcessor:
             os.rmdir(userId)
 
             print("Done saving stems.")
-
             await self.disconnect_from_db()
-            return "done"
+            result = {
+                "userId": userId,
+                "event": "separation_done",
+            }
+            return result
         except Exception as e:
             print(e)
             await self.disconnect_from_db()

@@ -13,9 +13,11 @@ class WorkerManager:
         self.queue_name = queue_name
         redis_host = os.getenv("REDIS_HOST", "localhost")
         redis_port = os.getenv("REDIS_PORT", "6379")
+        # https://docs.bullmq.io/bull/important-notes
         self.opts = {
             "connection": f"redis://{redis_host}:{redis_port}",
-            "stalled_interval": 120000,  # 120 seconds
+            "stalledInterval": 120000,  # 120 seconds
+            # "lockDuration": 120000,  # 120 seconds
         }
         self.worker = None
 

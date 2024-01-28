@@ -86,29 +86,6 @@ const startUp = async () => {
     res.status(200).send(files);
   });
 
-  app.get("/:userId/:object", (req: Request, res: Response) => {
-    const user = req.user;
-    const userId = req.params.userId;
-    const objectName = req.params.object;
-    if (!userId || !objectName)
-      res.status(400).send("Path must be of the form /:userId/:object");
-    if (!user) res.status(401).send("Unauthorized");
-
-    const filePath = `${userId}/${objectName}`;
-
-    minioClient.getObject(
-      process.env.MINIO_DEFAULT_BUCKET || "audio",
-      filePath,
-      (err, stream) => {
-        if (err) {
-          res.status(500).send(err.message);
-          return;
-        }
-        stream.pipe(res);
-      }
-    );
-  });
-
   /**
    * This endpoint returns a signed url for the object
    * Allows the client to download/stream the object directly from minio
@@ -138,27 +115,6 @@ const startUp = async () => {
         res.status(200).json({ url });
       }
     );
-  });
-
-  app.delete("/files/:id", async (req: Request, res: Response) => {
-    const user = req.user;
-    if (!user) return res.status(401).send("Unauthorized");
-    const id = req.params.id;
-    const audio = await prisma.audioFile.findUnique({
-      where: {
-        id,
-      },
-    });
-    if (!audio) return res.status(404).json({ message: "File not found" });
-    if (audio.userId !== user.id)
-      return res.status(401).json({ message: "Unauthorized" });
-
-    await prisma.audioFile.delete({
-      where: {
-        id,
-      },
-    });
-    res.status(200).json({ id, message: "File deleted" });
   });
 
   /**
