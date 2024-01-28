@@ -24,6 +24,7 @@ model AudioFile {
   filePath      String       // Path in MinIO object storage
   userId        String       // Relation to User model
   user          User         @relation(fields: [userId], references: [id])
+  fileType      String       // File type (e.g. wav, mp3, etc.)
   parentId      String?      // Relation to parent AudioFile (if this is a stem)
   parent        AudioFile?   @relation("ParentAudioFile", fields: [parentId], references: [id])
   stems         AudioFile[]  @relation("ParentAudioFile")

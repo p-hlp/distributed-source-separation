@@ -8,6 +8,7 @@ export type RawFile = {
 
 // Parses a standard Node.js IncomingMessage request - https://nodejs.org/api/http.html#class-httpincomingmessage
 export const parseMultipartReq = async (req: Request) => {
+  delete req.headers.authorization;
   const bb = busboy({ headers: req.headers });
 
   // Pipe request stream into busboy
@@ -28,4 +29,20 @@ export const parseMultipartReq = async (req: Request) => {
 
     bb.on("close", () => resolve(files));
   });
+};
+
+const contentTypeToFileType: Record<string, string> = {
+  "audio/wav": "wav",
+  "audio/flac": "flac",
+  "audio/mp3": "mp3",
+  "audio/mpeg": "mp3",
+  "audio/x-wav": "wav",
+  "audio/x-flac": "flac",
+  "audio/x-mp3": "mp3",
+  "audio/x-ogg": "ogg",
+  "audio/x-mpeg": "mp3",
+};
+
+export const getFileType = (contentType: string): string | undefined => {
+  return contentTypeToFileType[contentType];
 };

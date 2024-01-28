@@ -1,4 +1,5 @@
 import { Auth0Provider, withAuthenticationRequired } from "@auth0/auth0-react";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RootRoute, Router, RouterProvider } from "@tanstack/react-router";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -9,6 +10,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const rootRoute = new RootRoute({
   component: withAuthenticationRequired(App),
@@ -22,6 +24,8 @@ const router = new Router({
   defaultStaleTime: 5000,
 });
 
+export const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Auth0Provider
@@ -33,7 +37,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       }}
     >
       <AxiosProvider>
-        <RouterProvider router={router} />
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
       </AxiosProvider>
     </Auth0Provider>
   </React.StrictMode>
