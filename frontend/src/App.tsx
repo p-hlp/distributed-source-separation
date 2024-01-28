@@ -10,12 +10,13 @@ import {
   List,
   ListItem,
   ListItemText,
+  MenuItem,
+  Select,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AudioPlayer } from "./components/AudioPlayer";
 import { FileUploadForm } from "./components/FileUploadForm";
 import { LogoutButton } from "./components/LogoutButton";
@@ -29,7 +30,9 @@ const listFilesAPI = async (): Promise<AudioFileResponse[]> => {
 
 export const App = () => {
   const { isAuthenticated } = useAuth0();
-  const [text, setText] = useState<string>("");
+  const [selectedFile, setSelectedFile] = useState<AudioFileResponse | null>(
+    null
+  );
   const [openStems, setOpenStems] = useState<{ [key: string]: boolean }>({});
 
   const {
@@ -43,10 +46,12 @@ export const App = () => {
     gcTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  const handleTestQueueRequest = async () => {
+  const handleFileSeparation = async () => {
+    if (!selectedFile) return;
     const response = await axiosInstance.post("/separate", {
-      data: text,
+      data: selectedFile.id,
     });
+    setSelectedFile(null);
     console.log(response.data);
   };
 
@@ -57,20 +62,41 @@ export const App = () => {
     }));
   };
 
+  const selectableFiles = useMemo(() => {
+    console.log("selectableFiles changed", files);
+    return files?.filter((file) => !file.parentId && !file.stems?.length) || [];
+  }, [files]);
+
+  useEffect(() => {
+    if (selectableFiles.length > 0 && !selectedFile) {
+      setSelectedFile(selectableFiles[0]);
+    }
+  }, [selectableFiles, selectedFile]);
+
   return (
     <Stack direction="column" spacing={2} padding={2}>
       <FileUploadForm />
       <Stack direction="row" spacing={2}>
-        <TextField
-          id="text-input"
-          label="AudioFileID"
-          value={text}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setText(event.target.value);
+        <Select
+          sx={{ maxWidth: 400 }}
+          labelId="select-file-label"
+          id="select-file"
+          value={selectedFile?.id || ""}
+          onChange={(event) => {
+            const file = selectableFiles.find(
+              (f) => f.id === event.target.value
+            );
+            setSelectedFile(file || null);
           }}
-        />
+        >
+          {selectableFiles.map((file) => (
+            <MenuItem key={file.id} value={file.id}>
+              {file.name}
+            </MenuItem>
+          ))}
+        </Select>
         <ButtonGroup variant="outlined" aria-label="outlined button group">
-          <Button onClick={handleTestQueueRequest}>Separate</Button>
+          <Button onClick={handleFileSeparation}>Separate</Button>
           {isAuthenticated && <LogoutButton />}
         </ButtonGroup>
       </Stack>
@@ -116,8 +142,12 @@ export const App = () => {
                 >
                   <List dense>
                     {file.stems?.map((stem) => (
-                      <ListItem key={stem.id} divider sx={{ pl: 4 }}>
-                        <Stack direction="column">
+                      <ListItem key={stem.id} divider sx={{ pl: 4, pr: 6 }}>
+                        <Stack
+                          direction="row"
+                          spacing={4}
+                          sx={{ width: "100%" }}
+                        >
                           <ListItemText
                             primary={stem.name}
                             secondary={stem.id}

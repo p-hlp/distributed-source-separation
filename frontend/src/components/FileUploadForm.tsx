@@ -19,8 +19,11 @@ export const FileUploadForm = () => {
     const formData = new FormData();
     formData.append("file", file, sanitizedFileName);
     console.log(formData);
-    await axiosInstance.post("/upload", formData);
-    queryClient.invalidateQueries({ queryKey: ["files"] });
+    const response = await axiosInstance.post("/upload", formData);
+    if (response) {
+      queryClient.invalidateQueries({ queryKey: ["files"] });
+      setFile(null);
+    }
   };
 
   return (
