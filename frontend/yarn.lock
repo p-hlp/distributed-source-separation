@@ -788,20 +788,20 @@
     "@tanstack/store" "0.1.3"
     use-sync-external-store "^1.2.0"
 
-"@tanstack/router-generator@1.12.16":
-  version "1.12.16"
-  resolved "https://registry.yarnpkg.com/@tanstack/router-generator/-/router-generator-1.12.16.tgz#f1a3697789b5adfd6b8f193025f977bfd9542ca6"
-  integrity sha512-GAlSqcsq7UVSkOa5P+IFQDSy2E+QJBorVVmPuYYNs4emjCs+Hsejo2x864lN42BE49LHDrkhldpsVusgfURI9A==
+"@tanstack/router-generator@1.14.1":
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/router-generator/-/router-generator-1.14.1.tgz#48fdfb799289406595aaa907368e3b3b86a8590c"
+  integrity sha512-BCXveyGwaDjdNPzRu9loB6EWrF8G/rnhKG90639QxrnT8UFmtks59q7OoYf3jO7+Kx1asxgKoEsfbdq7OmmMcg==
   dependencies:
     prettier "^3.1.1"
     zod "^3.22.4"
 
-"@tanstack/router-vite-plugin@1.12.16":
-  version "1.12.16"
-  resolved "https://registry.yarnpkg.com/@tanstack/router-vite-plugin/-/router-vite-plugin-1.12.16.tgz#dbce7ea094aab7e8eef6162f710d434f230933e4"
-  integrity sha512-0XGqOFnKUFBKJgQTMRKpcZGWuphIwBlpPNk0I5WLEJcm3l73G0QkntjgglF5umk+xdyFymCLGGStzU+l55GPSA==
+"@tanstack/router-vite-plugin@1.14.1":
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/@tanstack/router-vite-plugin/-/router-vite-plugin-1.14.1.tgz#dd6bb5bbd4cea87b5328c9b14c4656695893058d"
+  integrity sha512-Hg4EoQ7eeDsW9WA3JTRadj5ftPt1IMtzeXv2CMcFKm72qJT6jta9LjNPHcM+yjjYzcHiuMfBQ6DxyPtUMwYj2Q==
   dependencies:
-    "@tanstack/router-generator" "1.12.16"
+    "@tanstack/router-generator" "1.14.1"
 
 "@tanstack/store@0.1.3":
   version "0.1.3"
