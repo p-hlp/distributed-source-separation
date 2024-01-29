@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 
+/**
+ * Middleware to convert token query param to authorization header
+ * Used for SSE connections since they do not allow modifying headers
+ */
 export const tokenParamToHeader = (
   req: Request,
   res: Response,

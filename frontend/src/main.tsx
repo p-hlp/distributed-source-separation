@@ -11,6 +11,7 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastContainer } from "react-toastify";
 
 const rootRoute = new RootRoute({
   component: withAuthenticationRequired(App),
@@ -39,6 +40,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <AxiosProvider>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
+          <ToastContainer
+            theme="dark"
+            position="top-center"
+            closeOnClick
+            autoClose={3000}
+            hideProgressBar
+          />
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </AxiosProvider>

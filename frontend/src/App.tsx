@@ -16,12 +16,16 @@ import {
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { AudioPlayer } from "./components/AudioPlayer";
 import { FileUploadForm } from "./components/FileUploadForm";
 import { LogoutButton } from "./components/LogoutButton";
 import { axiosInstance } from "./lib";
+import { queryClient } from "./main";
 import { AudioFileResponse } from "./shared/types";
+import { SSEComponent } from "./components/SSEComponent";
 
 const listFilesAPI = async (): Promise<AudioFileResponse[]> => {
   const response = await axiosInstance.get<AudioFileResponse[]>("/files");
@@ -34,6 +38,8 @@ export const App = () => {
     null
   );
   const [openStems, setOpenStems] = useState<{ [key: string]: boolean }>({});
+  const [separationInProgress, setSeparationInProgress] =
+    useState<boolean>(false);
 
   const {
     data: files,
@@ -52,6 +58,7 @@ export const App = () => {
       data: selectedFile.id,
     });
     setSelectedFile(null);
+    setSeparationInProgress(true);
     console.log(response.data);
   };
 
@@ -73,9 +80,20 @@ export const App = () => {
     }
   }, [selectableFiles, selectedFile]);
 
+  const onSSEMessage = useCallback((message: string) => {
+    toast(message, { type: "info" });
+    queryClient.invalidateQueries({ queryKey: ["files"] });
+    setSeparationInProgress(false);
+  }, []);
+
   return (
     <Stack direction="column" spacing={2} padding={2}>
-      <FileUploadForm />
+      <SSEComponent onMessage={onSSEMessage} />
+      <FileUploadForm
+        onFileUpload={() => {
+          queryClient.invalidateQueries({ queryKey: ["files"] });
+        }}
+      />
       <Stack direction="row" spacing={2}>
         <Select
           sx={{ maxWidth: 400 }}
@@ -96,7 +114,15 @@ export const App = () => {
           ))}
         </Select>
         <ButtonGroup variant="outlined" aria-label="outlined button group">
-          <Button onClick={handleFileSeparation}>Separate</Button>
+          <Button
+            onClick={handleFileSeparation}
+            disabled={separationInProgress}
+          >
+            {!separationInProgress && (
+              <Typography variant="body1">Separate</Typography>
+            )}
+            {separationInProgress && <CircularProgress size={24} />}
+          </Button>
           {isAuthenticated && <LogoutButton />}
         </ButtonGroup>
       </Stack>
@@ -109,57 +135,61 @@ export const App = () => {
       {files && (
         <List dense>
           {files.length > 0 &&
-            files.map((file) => (
-              <div key={file.id}>
-                <ListItem
-                  key={file.id}
-                  divider
-                  alignItems="center"
-                  secondaryAction={
-                    file.stems &&
-                    file.stems.length > 0 && (
-                      <IconButton
-                        edge="end"
-                        aria-label="toggle stems"
-                        onClick={() => toggleStems(file.id)}
-                      >
-                        {openStems[file.id] ? (
-                          <ExpandLessIcon />
-                        ) : (
-                          <ExpandMoreIcon />
-                        )}
-                      </IconButton>
-                    )
-                  }
-                >
-                  <ListItemText primary={file.name} secondary={file.id} />
-                  <AudioPlayer filePath={file.filePath} />
-                </ListItem>
-                <Collapse
-                  in={openStems[file.id] ?? false}
-                  timeout="auto"
-                  unmountOnExit
-                >
-                  <List dense>
-                    {file.stems?.map((stem) => (
-                      <ListItem key={stem.id} divider sx={{ pl: 4, pr: 6 }}>
-                        <Stack
-                          direction="row"
-                          spacing={4}
-                          sx={{ width: "100%" }}
+            files
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((file) => (
+                <div key={file.id}>
+                  <ListItem
+                    key={file.id}
+                    divider
+                    alignItems="center"
+                    secondaryAction={
+                      file.stems &&
+                      file.stems.length > 0 && (
+                        <IconButton
+                          edge="end"
+                          aria-label="toggle stems"
+                          onClick={() => toggleStems(file.id)}
                         >
-                          <ListItemText
-                            primary={stem.name}
-                            secondary={stem.id}
-                          />
-                          <AudioPlayer filePath={stem.filePath} />
-                        </Stack>
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
-              </div>
-            ))}
+                          {openStems[file.id] ? (
+                            <ExpandLessIcon />
+                          ) : (
+                            <ExpandMoreIcon />
+                          )}
+                        </IconButton>
+                      )
+                    }
+                  >
+                    <ListItemText primary={file.name} secondary={file.id} />
+                    <AudioPlayer filePath={file.filePath} />
+                  </ListItem>
+                  <Collapse
+                    in={openStems[file.id] ?? false}
+                    timeout="auto"
+                    unmountOnExit
+                  >
+                    <List dense>
+                      {file.stems
+                        ?.sort((a, b) => a.name.localeCompare(b.name))
+                        .map((stem) => (
+                          <ListItem key={stem.id} divider sx={{ pl: 4, pr: 6 }}>
+                            <Stack
+                              direction="row"
+                              spacing={4}
+                              sx={{ width: "100%" }}
+                            >
+                              <ListItemText
+                                primary={stem.name}
+                                secondary={stem.id}
+                              />
+                              <AudioPlayer filePath={stem.filePath} />
+                            </Stack>
+                          </ListItem>
+                        ))}
+                    </List>
+                  </Collapse>
+                </div>
+              ))}
           {files.length === 0 && (
             <Typography variant="body1">No files found.</Typography>
           )}
