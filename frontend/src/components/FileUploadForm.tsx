@@ -3,10 +3,13 @@ import { Button, Stack } from "@mui/material";
 import { MuiFileInput } from "mui-file-input";
 import { useState } from "react";
 import { axiosInstance } from "../lib/axios";
-import { queryClient } from "../main";
 import { sanitize } from "../shared/stringUtils";
 
-export const FileUploadForm = () => {
+interface Props {
+  onFileUpload?: () => void;
+}
+
+export const FileUploadForm = ({ onFileUpload }: Props) => {
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (file: File | null) => {
@@ -18,10 +21,9 @@ export const FileUploadForm = () => {
     const sanitizedFileName = sanitize(file.name);
     const formData = new FormData();
     formData.append("file", file, sanitizedFileName);
-    console.log(formData);
     const response = await axiosInstance.post("/upload", formData);
     if (response) {
-      queryClient.invalidateQueries({ queryKey: ["files"] });
+      onFileUpload && onFileUpload();
       setFile(null);
     }
   };

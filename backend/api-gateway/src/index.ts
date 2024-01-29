@@ -11,25 +11,72 @@ import { prisma } from "./lib";
 import { initMinioDefaultBucket, minioClient } from "./lib/minio";
 import { processQueue, processQueueEvents } from "./lib/queue";
 import { authenticate, createOrAddUser } from "./middleware";
+import { tokenParamToHeader } from "./middleware/tokenParamToHeader.middleware";
 import { RawFile, getFileType, parseMultipartReq } from "./shared/httpUtils";
 
 const port = process.env.PORT;
+
+const sseConnections = new Map<string, Response>();
 
 const startUp = async () => {
   const app: Express = express();
   app.use(cors());
   app.use(helmet());
   app.use(express.json());
+  app.use(tokenParamToHeader);
   app.use(authenticate);
   app.use(createOrAddUser);
 
   await initMinioDefaultBucket();
 
   // registerApiRoutes(app);
+
   processQueueEvents.on("completed", (result) => {
     console.log("Job completed - id", result.jobId);
     console.log("Job completed - result", result.returnvalue);
-    // send result to client via. SSE
+    const clientId = (result.returnvalue as any).userId;
+    const response = {
+      jobId: result.jobId,
+      userId: (result.returnvalue as any).userId,
+      result: (result.returnvalue as any).event,
+    };
+    const sseResponse = sseConnections.get(clientId);
+    if (sseResponse) sseResponse.write(`data: ${JSON.stringify(response)}\n\n`);
+  });
+
+  app.get("/events", (req: Request, res: Response) => {
+    // Initialie SSE connection with `clientId`
+    const clientId = req.user?.id;
+    if (!clientId) return res.status(401).send("Unauthorized");
+
+    console.log("Client connected", clientId);
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+      "access-control-allow-origin": "*",
+    });
+
+    // Store the response object so we can send data to it later
+    sseConnections.set(clientId, res);
+
+    // Send a comment to the client, so it knows the connection was established
+    res.write(":ok\n\n");
+
+    // When the client closes the connection, remove the corresponding response object
+    req.on("close", () => {
+      console.log("Client closed connection", clientId);
+      sseConnections.delete(clientId);
+    });
+  });
+
+  app.post("/send", (req: Request, res: Response) => {
+    const { message } = req.body;
+    const clientId = req.user?.id;
+    if (!clientId) return res.status(401).send("Unauthorized");
+    const sseResponse = sseConnections.get(clientId);
+    if (sseResponse) sseResponse.write(`data: ${message ?? ""}\n\n`);
+    res.status(204).end();
   });
 
   app.post("/upload", async (req: Request, res: Response) => {
