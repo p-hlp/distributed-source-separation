@@ -75,7 +75,7 @@ const startUp = async () => {
     const clientId = req.user?.id;
     if (!clientId) return res.status(401).send("Unauthorized");
     const sseResponse = sseConnections.get(clientId);
-    if (sseResponse) sseResponse.write(`data: ${message ?? ""}\n\n`);
+    if (sseResponse) sseResponse.write(`data: ${JSON.stringify(message)}\n\n`);
     res.status(204).end();
   });
 
