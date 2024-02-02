@@ -29,6 +29,7 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+.env.docker
 
 # python
 *.pyc
@@ -41,3 +42,7 @@ tracks
 stems
 *.mp3
 *.wav
+
+# PyTorch files
+*.pt
+*.th

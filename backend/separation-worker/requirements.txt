@@ -1,0 +1,7 @@
+asyncio==3.4.3
+bullmq==2.2.1
+demucs @ git+https://github.com/CarlGao4/demucs.git@9aeca3b5f58df0ebdb5c29086f587570bb6a91a1
+minio==7.2.3
+prisma==0.12.0
+PySoundFile==0.9.0.post1
+pydantic==2.6.0

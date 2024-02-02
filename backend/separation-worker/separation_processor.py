@@ -27,6 +27,8 @@ class SeparationProcessor:
         self.minio_client = None
         self.initialize_minio_client()
         print(f"Using device: {device}")
+        th.hub.set_dir(os.getenv("MODELS_DIR"))
+        print(f"TH Hub dir: {th.hub.get_dir()}")
         self.separator = Separator(model=model, device=device)
 
     async def connect_to_db(self):
@@ -50,6 +52,7 @@ class SeparationProcessor:
         )
 
         # Ensure the default bucket exists
+        print(f"Ensuring bucket {minio_default_bucket} exists...")
         if not self.minio_client.bucket_exists(minio_default_bucket):
             self.minio_client.make_bucket(minio_default_bucket)
 

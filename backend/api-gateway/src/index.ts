@@ -44,6 +44,11 @@ const startUp = async () => {
     if (sseResponse) sseResponse.write(`data: ${JSON.stringify(response)}\n\n`);
   });
 
+  processQueueEvents.on("failed", (jobId, failedReason) => {
+    console.log("Job failed - id", jobId);
+    console.log("Job failed - err", failedReason);
+  });
+
   app.get("/events", (req: Request, res: Response) => {
     // Initialie SSE connection with `clientId`
     const clientId = req.user?.id;
