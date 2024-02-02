@@ -4,7 +4,7 @@ from bullmq import Job
 from minio import Minio
 from dotenv import load_dotenv
 from demucs.api import Separator, save_audio
-import torchaudio
+import torchaudio as ta
 import torch as th
 import io
 import uuid
@@ -16,11 +16,11 @@ load_dotenv()
 class SeparationProcessor:
     def __init__(
         self,
-        device: str = "cuda"
-        if th.cuda.is_available()
-        else "mps"
-        if th.backends.mps.is_available()
-        else "cpu",
+        device: str = (
+            "cuda"
+            if th.cuda.is_available()
+            else "mps" if th.backends.mps.is_available() else "cpu"
+        ),
         model: str = "htdemucs_ft",
     ):
         self.prisma = Prisma()
@@ -80,7 +80,7 @@ class SeparationProcessor:
                 response.release_conn()
 
             audio_buffer = io.BytesIO(file_data)
-            waveform, sample_rate = torchaudio.load(audio_buffer, format=file_type)
+            waveform, sample_rate = ta.load(audio_buffer)
             print(f"Sample rate: {sample_rate}")
 
             _, separated_stems = self.separator.separate_tensor(waveform)
@@ -95,15 +95,16 @@ class SeparationProcessor:
                 if not os.path.exists(userId):
                     os.makedirs(userId)
 
+                # Temporary save to local file system TODO directly save from stream
                 save_audio(source, full_path, samplerate=sample_rate)
 
+                # Save to minio
                 self.minio_client.fput_object(
                     os.getenv("MINIO_DEFAULT_BUCKET"),
                     full_path,
                     file_path=full_path,
                     metadata={"mimeType": f"audio/{file_type}", "name": stem},
                 )
-                print(f"Saved to object storage: {stem}")
 
                 # Save to database
                 response = await self.prisma.audiofile.create(
@@ -115,9 +116,7 @@ class SeparationProcessor:
                         "parentId": id,
                     }
                 )
-                print(f"Saved to db: {response.id}")
                 os.remove(full_path)
-                print(f"Removed local file: {full_path}")
 
             # Remove folder
             os.rmdir(userId)
