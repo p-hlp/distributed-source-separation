@@ -9,7 +9,7 @@ async def main():
 
     processor = SeparationProcessor(model="htdemucs")
 
-    worker_manager = WorkerManager(processor)
+    worker_manager = WorkerManager(processor, queue_name="separate")
     await worker_manager.start_worker()
 
 

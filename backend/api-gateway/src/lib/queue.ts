@@ -1,5 +1,8 @@
 import { Queue, QueueEvents } from "bullmq";
-import { processQueueName } from "../types";
+import { audioToMidiQueueName, separateQueueName } from "../types";
 
-export const processQueue = new Queue(processQueueName);
-export const processQueueEvents = new QueueEvents(processQueueName);
+export const separateQueue = new Queue(separateQueueName);
+export const separateQueueEvents = new QueueEvents(separateQueueName);
+
+export const audioToMidiQueue = new Queue(audioToMidiQueueName);
+export const audioToMidiQueueEvents = new QueueEvents(audioToMidiQueueName);

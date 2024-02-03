@@ -16,6 +16,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   audioFiles AudioFile[]
+  midiFiles MidiFile[]
+  transcriptions Transcription[]
 }
 
 model AudioFile {
@@ -36,7 +38,11 @@ model AudioFile {
 
 model MidiFile {
   id          String     @id @default(uuid())
+  name        String
+  userId      String     // Relation to User model
+  user        User       @relation(fields: [userId], references: [id])
   filePath    String     // Path in MinIO object storage
+  fileType    String     @default("mid") 
   audioFileId String     @unique
   audioFile   AudioFile  @relation(fields: [audioFileId], references: [id])
   createdAt   DateTime   @default(now())
@@ -46,6 +52,8 @@ model MidiFile {
 model Transcription {
   id          String     @id @default(uuid())
   text        String     // Transcribed text
+  userId      String     // Relation to User model
+  user        User       @relation(fields: [userId], references: [id])
   audioFileId String     @unique
   audioFile   AudioFile  @relation(fields: [audioFileId], references: [id])
   createdAt   DateTime   @default(now())
