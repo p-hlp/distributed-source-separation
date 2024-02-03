@@ -85,7 +85,7 @@ class SeparationProcessor:
             audio_buffer = io.BytesIO(file_data)
             waveform, sample_rate = ta.load(audio_buffer)
             print(f"Sample rate: {sample_rate}")
-
+            print("Separating stems...")
             _, separated_stems = self.separator.separate_tensor(waveform)
             print(f"Stems count: {len(separated_stems)}")
 
@@ -128,10 +128,17 @@ class SeparationProcessor:
             await self.disconnect_from_db()
             result = {
                 "userId": userId,
-                "event": "separation_done",
+                "audioFileId": id,
+                "status": "done",
             }
             return result
         except Exception as e:
             print(e)
             await self.disconnect_from_db()
-            return "error"
+            result = {
+                "userId": userId,
+                "audioFileId": id,
+                "status": "failed",
+                "error": str(e),
+            }
+            raise RuntimeError(result)

@@ -33,8 +33,21 @@ export const SSEComponent = ({ onMessage }: Props) => {
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      onMessage(data);
-      console.log("onMessage event", data);
+      const eventName = data.event;
+      switch (eventName) {
+        case "message":
+          onMessage(data.message);
+          console.log("message event", data);
+          break;
+        case "separate":
+          console.log("separate event", data);
+          break;
+        case "audioToMidi":
+          console.log("audioToMidi event", data);
+          break;
+        default:
+          console.log("Unhandled event", eventName);
+      }
     };
 
     return () => {

@@ -9,7 +9,12 @@ import mime from "mime-types";
 import { v4 as uuid } from "uuid";
 import { prisma } from "./lib";
 import { initMinioDefaultBucket, minioClient } from "./lib/minio";
-import { processQueue, processQueueEvents } from "./lib/queue";
+import {
+  audioToMidiQueue,
+  audioToMidiQueueEvents,
+  separateQueue,
+  separateQueueEvents,
+} from "./lib/queue";
 import { authenticate, createOrAddUser } from "./middleware";
 import { tokenParamToHeader } from "./middleware/tokenParamToHeader.middleware";
 import { RawFile, getFileType, parseMultipartReq } from "./shared/httpUtils";
@@ -17,6 +22,19 @@ import { RawFile, getFileType, parseMultipartReq } from "./shared/httpUtils";
 const port = process.env.PORT;
 
 const sseConnections = new Map<string, Response>();
+
+const sendEvent = <T>(res: Response, data: T) => {
+  res.write(`data: ${JSON.stringify(data)}\n\n`);
+};
+
+interface CompletedQueueResult {
+  userId: string;
+  audioFileId: string;
+  status: "done" | "inProgress" | "failed";
+  progress?: number;
+}
+
+type FailedQueueResult = CompletedQueueResult & { error: string };
 
 const startUp = async () => {
   const app: Express = express();
@@ -31,22 +49,68 @@ const startUp = async () => {
 
   // registerApiRoutes(app);
 
-  processQueueEvents.on("completed", (result) => {
+  separateQueueEvents.on("completed", (result) => {
     console.log("Job completed - id", result.jobId);
     console.log("Job completed - result", result.returnvalue);
-    const clientId = (result.returnvalue as any).userId;
+    const completedResult = result.returnvalue as any as CompletedQueueResult;
+    const clientId = completedResult.userId;
     const response = {
       jobId: result.jobId,
-      userId: (result.returnvalue as any).userId,
-      result: (result.returnvalue as any).event,
+      audioFileId: completedResult.audioFileId,
+      status: completedResult.status,
+      event: "separate",
     };
     const sseResponse = sseConnections.get(clientId);
-    if (sseResponse) sseResponse.write(`data: ${JSON.stringify(response)}\n\n`);
+    if (sseResponse) sendEvent(sseResponse, response);
   });
 
-  processQueueEvents.on("failed", (jobId, failedReason) => {
-    console.log("Job failed - id", jobId);
-    console.log("Job failed - err", failedReason);
+  separateQueueEvents.on("failed", (reason, id) => {
+    console.log("Separation failed - jobId:", reason.jobId);
+    const failedResult = JSON.parse(reason.failedReason) as FailedQueueResult;
+    console.log("Failed Result", JSON.parse(reason.failedReason));
+    console.log("AudioFileId", failedResult["audioFileId"]);
+    const response = {
+      jobId: reason.jobId,
+      audioFileId: failedResult.audioFileId,
+      status: failedResult.status,
+      error: failedResult.error,
+      event: "separate",
+    };
+    const sseResponse = sseConnections.get(failedResult.userId);
+    if (sseResponse) sendEvent(sseResponse, response);
+    else console.log("No sseResponse found for", failedResult.userId);
+  });
+
+  audioToMidiQueueEvents.on("completed", (result) => {
+    console.log("Job completed - id", result.jobId);
+    console.log("Job completed - result", result.returnvalue);
+    const completedResult = result.returnvalue as any as CompletedQueueResult;
+    const clientId = completedResult.userId;
+    const response = {
+      jobId: result.jobId,
+      audioFileId: completedResult.audioFileId,
+      status: completedResult.status,
+      event: "audioToMidi",
+    };
+    const sseResponse = sseConnections.get(clientId);
+    if (sseResponse) sendEvent(sseResponse, response);
+  });
+
+  audioToMidiQueueEvents.on("failed", (reason, id) => {
+    console.log("Separation failed - jobId:", reason.jobId);
+    const failedResult = JSON.parse(reason.failedReason) as FailedQueueResult;
+    console.log("Failed Result", JSON.parse(reason.failedReason));
+    console.log("AudioFileId", failedResult["audioFileId"]);
+    const response = {
+      jobId: reason.jobId,
+      audioFileId: failedResult.audioFileId,
+      status: failedResult.status,
+      error: failedResult.error,
+      event: "separate",
+    };
+    const sseResponse = sseConnections.get(failedResult.userId);
+    if (sseResponse) sendEvent(sseResponse, response);
+    else console.log("No sseResponse found for", failedResult.userId);
   });
 
   app.get("/events", (req: Request, res: Response) => {
@@ -79,8 +143,13 @@ const startUp = async () => {
     const { message } = req.body;
     const clientId = req.user?.id;
     if (!clientId) return res.status(401).send("Unauthorized");
+    console.log("Sending message to client", message);
+    const response = {
+      event: "message",
+      message,
+    };
     const sseResponse = sseConnections.get(clientId);
-    if (sseResponse) sseResponse.write(`data: ${JSON.stringify(message)}\n\n`);
+    if (sseResponse) sendEvent(sseResponse, response);
     res.status(204).end();
   });
 
@@ -132,7 +201,12 @@ const startUp = async () => {
         parentId: null,
       },
       include: {
-        stems: true,
+        stems: {
+          include: {
+            midiFile: true,
+          },
+        },
+        midiFile: true,
       },
     });
     res.status(200).send(files);
@@ -178,7 +252,17 @@ const startUp = async () => {
       audioFileId: req.body.data,
     };
     console.log("separate jobPayload", jobPayload);
-    const job = await processQueue.add("processData", jobPayload);
+    const job = await separateQueue.add("processData", jobPayload);
+    res.status(200).json({ message: "Data added to queue", jobId: job.id });
+  });
+
+  app.post("/audio-to-midi", async (req: Request, res: Response) => {
+    const jobPayload = {
+      userId: req.user?.id,
+      audioFileId: req.body.data,
+    };
+    console.log("audio-to-midi jobPayload", jobPayload);
+    const job = await audioToMidiQueue.add("processData", jobPayload);
     res.status(200).json({ message: "Data added to queue", jobId: job.id });
   });
 

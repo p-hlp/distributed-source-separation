@@ -2,20 +2,20 @@ import os
 import asyncio
 from bullmq import Worker
 from dotenv import load_dotenv
-from separation_processor import SeparationProcessor
+from processor import Processor
 
 load_dotenv()
 
 
 class WorkerManager:
-    def __init__(self, processor: SeparationProcessor, queue_name=None):
+    def __init__(self, processor: Processor, queue_name=None):
         self.processor = processor
+        if queue_name is None:
+            raise TypeError("queue_name is required")
+
         self.queue_name = queue_name
         redis_host = os.getenv("REDIS_HOST", "localhost")
         redis_port = os.getenv("REDIS_PORT", "6379")
-
-        if queue_name is None:
-            raise TypeError("queue_name is required")
         # https://docs.bullmq.io/bull/important-notes
         self.opts = {
             "connection": f"redis://{redis_host}:{redis_port}",

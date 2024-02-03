@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { DownloadOutlined } from "@mui/icons-material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -22,15 +23,19 @@ import "react-toastify/dist/ReactToastify.css";
 import { AudioPlayer } from "./components/AudioPlayer";
 import { FileUploadForm } from "./components/FileUploadForm";
 import { LogoutButton } from "./components/LogoutButton";
-import { axiosInstance } from "./lib";
-import { queryClient } from "./main";
-import { AudioFileResponse } from "./shared/types";
 import { SSEComponent } from "./components/SSEComponent";
+import { axiosInstance, rawAxiosInstance } from "./lib";
+import { queryClient } from "./main";
+import { AudioFileResponse, MidiFileResponse } from "./shared/types";
 
 const listFilesAPI = async (): Promise<AudioFileResponse[]> => {
   const response = await axiosInstance.get<AudioFileResponse[]>("/files");
   return response.data;
 };
+
+interface MidiConversionState {
+  [key: string]: boolean;
+}
 
 export const App = () => {
   const { isAuthenticated } = useAuth0();
@@ -40,6 +45,9 @@ export const App = () => {
   const [openStems, setOpenStems] = useState<{ [key: string]: boolean }>({});
   const [separationInProgress, setSeparationInProgress] =
     useState<boolean>(false);
+
+  const [midiConversionInProgress, setMidiConversionInProgress] =
+    useState<MidiConversionState>({});
 
   const {
     data: files,
@@ -59,6 +67,22 @@ export const App = () => {
     });
     setSelectedFile(null);
     setSeparationInProgress(true);
+    console.log(response.data);
+  };
+
+  const toggleMidiConversion = (fileId: string) => {
+    setMidiConversionInProgress((prevMidiConversionInProgress) => ({
+      ...prevMidiConversionInProgress,
+      [fileId]: !prevMidiConversionInProgress[fileId],
+    }));
+  };
+
+  const handcleToMidiConversion = async (fileId: string) => {
+    if (midiConversionInProgress[fileId]) return;
+    toggleMidiConversion(fileId);
+    const response = await axiosInstance.post("/audio-to-midi", {
+      data: fileId,
+    });
     console.log(response.data);
   };
 
@@ -85,6 +109,21 @@ export const App = () => {
     queryClient.invalidateQueries({ queryKey: ["files"] });
     setSeparationInProgress(false);
   }, []);
+
+  const handleDownloadMidi = async (midiFile: MidiFileResponse | undefined) => {
+    if (!midiFile) return;
+    const response = await axiosInstance.get("signed/" + midiFile.filePath);
+    const minioUrl = response.data.url;
+    const minioResponse = await rawAxiosInstance.get(minioUrl, {
+      responseType: "blob",
+    });
+    const url = window.URL.createObjectURL(new Blob([minioResponse.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", midiFile.name);
+    document.body.appendChild(link);
+    link.click();
+  };
 
   return (
     <Stack direction="column" spacing={2} padding={2}>
@@ -183,6 +222,35 @@ export const App = () => {
                                 secondary={stem.id}
                               />
                               <AudioPlayer filePath={stem.filePath} />
+                              {!stem.midiFile && (
+                                <Button
+                                  variant="outlined"
+                                  onClick={() =>
+                                    handcleToMidiConversion(stem.id)
+                                  }
+                                  disabled={midiConversionInProgress[stem.id]}
+                                >
+                                  {!midiConversionInProgress[stem.id] && (
+                                    <Typography variant="body1">
+                                      Get Midi
+                                    </Typography>
+                                  )}
+                                  {midiConversionInProgress[stem.id] && (
+                                    <CircularProgress size={24} />
+                                  )}
+                                </Button>
+                              )}
+                              {stem.midiFile && (
+                                <Button
+                                  variant="outlined"
+                                  onClick={() =>
+                                    handleDownloadMidi(stem.midiFile)
+                                  }
+                                  startIcon={<DownloadOutlined />}
+                                >
+                                  Download
+                                </Button>
+                              )}
                             </Stack>
                           </ListItem>
                         ))}
