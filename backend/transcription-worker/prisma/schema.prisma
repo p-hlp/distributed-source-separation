@@ -1,0 +1,60 @@
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = "5"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  auth0Id   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  audioFiles AudioFile[]
+  midiFiles MidiFile[]
+  transcriptions Transcription[]
+}
+
+model AudioFile {
+  id            String       @id @default(uuid())
+  name          String
+  filePath      String       // Path in MinIO object storage
+  userId        String       // Relation to User model
+  user          User         @relation(fields: [userId], references: [id])
+  fileType      String       // File type (e.g. wav, mp3, etc.)
+  parentId      String?      // Relation to parent AudioFile (if this is a stem)
+  parent        AudioFile?   @relation("ParentAudioFile", fields: [parentId], references: [id])
+  stems         AudioFile[]  @relation("ParentAudioFile")
+  midiFile      MidiFile?
+  transcription Transcription?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model MidiFile {
+  id          String     @id @default(uuid())
+  name        String
+  userId      String     // Relation to User model
+  user        User       @relation(fields: [userId], references: [id])
+  filePath    String     // Path in MinIO object storage
+  fileType    String     @default("mid") 
+  audioFileId String     @unique
+  audioFile   AudioFile  @relation(fields: [audioFileId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Transcription {
+  id          String     @id @default(uuid())
+  text        String     // Transcribed text
+  userId      String     // Relation to User model
+  user        User       @relation(fields: [userId], references: [id])
+  audioFileId String     @unique
+  audioFile   AudioFile  @relation(fields: [audioFileId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+

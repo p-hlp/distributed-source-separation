@@ -14,6 +14,8 @@ import {
   audioToMidiQueueEvents,
   separateQueue,
   separateQueueEvents,
+  transcribeQueue,
+  transcribeQueueEvents,
 } from "./lib/queue";
 import { authenticate, createOrAddUser } from "./middleware";
 import { tokenParamToHeader } from "./middleware/tokenParamToHeader.middleware";
@@ -97,7 +99,7 @@ const startUp = async () => {
   });
 
   audioToMidiQueueEvents.on("failed", (reason, id) => {
-    console.log("Separation failed - jobId:", reason.jobId);
+    console.log("AudioToMidi failed - jobId:", reason.jobId);
     const failedResult = JSON.parse(reason.failedReason) as FailedQueueResult;
     console.log("Failed Result", JSON.parse(reason.failedReason));
     console.log("AudioFileId", failedResult["audioFileId"]);
@@ -107,6 +109,38 @@ const startUp = async () => {
       status: failedResult.status,
       error: failedResult.error,
       event: "separate",
+    };
+    const sseResponse = sseConnections.get(failedResult.userId);
+    if (sseResponse) sendEvent(sseResponse, response);
+    else console.log("No sseResponse found for", failedResult.userId);
+  });
+
+  transcribeQueueEvents.on("completed", (result) => {
+    console.log("Job completed - id", result.jobId);
+    console.log("Job completed - result", result.returnvalue);
+    const completedResult = result.returnvalue as any as CompletedQueueResult;
+    const clientId = completedResult.userId;
+    const response = {
+      jobId: result.jobId,
+      audioFileId: completedResult.audioFileId,
+      status: completedResult.status,
+      event: "transcribe",
+    };
+    const sseResponse = sseConnections.get(clientId);
+    if (sseResponse) sendEvent(sseResponse, response);
+  });
+
+  transcribeQueueEvents.on("failed", (reason, id) => {
+    console.log("Transcription failed - jobId:", reason.jobId);
+    const failedResult = reason.failedReason as any as FailedQueueResult;
+    console.log("Failed Result", failedResult);
+    console.log("AudioFileId", failedResult.audioFileId);
+    const response = {
+      jobId: reason.jobId,
+      audioFileId: failedResult.audioFileId,
+      status: failedResult.status,
+      error: failedResult.error,
+      event: "transcribe",
     };
     const sseResponse = sseConnections.get(failedResult.userId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -204,6 +238,7 @@ const startUp = async () => {
         stems: {
           include: {
             midiFile: true,
+            transcription: true,
           },
         },
         midiFile: true,
@@ -253,7 +288,9 @@ const startUp = async () => {
     };
     console.log("separate jobPayload", jobPayload);
     const job = await separateQueue.add("processData", jobPayload);
-    res.status(200).json({ message: "Data added to queue", jobId: job.id });
+    res
+      .status(200)
+      .json({ message: "Data added to separate-queue", jobId: job.id });
   });
 
   app.post("/audio-to-midi", async (req: Request, res: Response) => {
@@ -263,7 +300,21 @@ const startUp = async () => {
     };
     console.log("audio-to-midi jobPayload", jobPayload);
     const job = await audioToMidiQueue.add("processData", jobPayload);
-    res.status(200).json({ message: "Data added to queue", jobId: job.id });
+    res
+      .status(200)
+      .json({ message: "Data added to audioToMidi-queue", jobId: job.id });
+  });
+
+  app.post("/transcribe", async (req: Request, res: Response) => {
+    const jobPayload = {
+      userId: req.user?.id,
+      audioFileId: req.body.data,
+    };
+    console.log("transcribe jobPayload", jobPayload);
+    const job = await transcribeQueue.add("processData", jobPayload);
+    res
+      .status(200)
+      .json({ message: "Data added to transcribe-queue", jobId: job.id });
   });
 
   app.get("/", async (req, res) => {

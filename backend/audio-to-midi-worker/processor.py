@@ -128,6 +128,7 @@ class Processor:
                 sonify_midi=False,
                 save_model_outputs=False,
                 save_notes=False,
+                midi_tempo=tempo,
             )
 
             # Find *.mid file in output directory
@@ -150,7 +151,7 @@ class Processor:
                 bucket_name=self.minio_default_bucket,
                 object_name=object_name,
                 file_path=midi_path,
-                metadata={"mimeType": "audio/midi", "name": midi_file},
+                metadata={"mimeType": "audio/midi", "name": midi_file, "tempo": tempo},
             )
 
             # Create MidiFile record in database and update MidiFile on AudioFile

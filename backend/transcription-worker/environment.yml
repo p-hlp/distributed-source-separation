@@ -1,0 +1,22 @@
+name: transcribe
+channels:
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=12.1 -c pytorch
+  - pip:
+      - openai-whisper==20231117
+      - librosa==0.10.1
+      - minio==7.2.3
+      - prisma==0.12.0
+      - dotenv==0.0.5
+      - bullmq==2.2.2
+      - uuid==1.30
+      - setuptools-rust==1.8.1
+      - PySoundFile==1.16.0
+      - librosa==0.10.1

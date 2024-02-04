@@ -11,8 +11,8 @@ gpu_count = torch.cuda.device_count()
 print(f"Number of GPUs available: {gpu_count}")
 
 # htdemucs works, htdemucs_ft doesn't, pretrained checkpoints seem to have wrong shape
-separator = demucs.api.Separator(device="cuda")
-origin, separated = separator.separate_audio_file("test.wav")
+separator = demucs.api.Separator(device="cuda", model="htdemucs_ft")
+origin, separated = separator.separate_audio_file("test_2.wav")
 
 # Number of separated sources
 print(f"Number of separated sources: {len(separated)}")
