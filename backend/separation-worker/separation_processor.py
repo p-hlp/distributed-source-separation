@@ -8,6 +8,7 @@ import torchaudio as ta
 import torch as th
 import io
 import uuid
+import shutil
 
 # Load environment variables
 load_dotenv()
@@ -119,10 +120,9 @@ class SeparationProcessor:
                         "parentId": id,
                     }
                 )
-                os.remove(full_path)
 
             # Remove folder
-            os.rmdir(userId)
+            shutil.rmtree(userId)
 
             print("Done saving stems.")
             await self.disconnect_from_db()
@@ -135,6 +135,7 @@ class SeparationProcessor:
         except Exception as e:
             print(e)
             await self.disconnect_from_db()
+            shutil.rmtree(userId)
             result = {
                 "userId": userId,
                 "audioFileId": id,

@@ -4,7 +4,7 @@ import { axiosInstance } from "../lib";
 import { useAccessToken } from "../lib/TokenContext";
 
 interface Props {
-  onMessage: (message: string) => void;
+  onMessage: (message: string, toggleSeparationProgres: boolean) => void;
 }
 
 const buildUrl = (endpoint: string, token: string) => {
@@ -36,14 +36,20 @@ export const SSEComponent = ({ onMessage }: Props) => {
       const eventName = data.event;
       switch (eventName) {
         case "message":
-          onMessage(data.message);
+          onMessage(data.message, false);
           console.log("message event", data);
           break;
         case "separate":
+          onMessage(`${eventName}: ${data.status}`, true);
           console.log("separate event", data);
           break;
         case "audioToMidi":
+          onMessage(`${eventName}: ${data.status}`, false);
           console.log("audioToMidi event", data);
+          break;
+        case "transcribe":
+          onMessage(`${eventName}: ${data.status}`, false);
+          console.log("transcribe event", data);
           break;
         default:
           console.log("Unhandled event", eventName);

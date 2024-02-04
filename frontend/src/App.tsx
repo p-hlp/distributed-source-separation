@@ -7,6 +7,7 @@ import {
   ButtonGroup,
   CircularProgress,
   Collapse,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -104,11 +105,14 @@ export const App = () => {
     }
   }, [selectableFiles, selectedFile]);
 
-  const onSSEMessage = useCallback((message: string) => {
-    toast(message, { type: "info" });
-    queryClient.invalidateQueries({ queryKey: ["files"] });
-    setSeparationInProgress(false);
-  }, []);
+  const onSSEMessage = useCallback(
+    (message: string, toggleSeparationProgress: boolean) => {
+      toast(message, { type: "info" });
+      queryClient.invalidateQueries({ queryKey: ["files"] });
+      if (toggleSeparationProgress) setSeparationInProgress(false);
+    },
+    []
+  );
 
   const handleDownloadMidi = async (midiFile: MidiFileResponse | undefined) => {
     if (!midiFile) return;
@@ -123,6 +127,13 @@ export const App = () => {
     link.setAttribute("download", midiFile.name);
     document.body.appendChild(link);
     link.click();
+  };
+
+  const handleTranscribe = async (audioFile: AudioFileResponse) => {
+    const response = await axiosInstance.post("/transcribe", {
+      data: audioFile.id,
+    });
+    console.log(response.data);
   };
 
   return (
@@ -212,44 +223,71 @@ export const App = () => {
                         ?.sort((a, b) => a.name.localeCompare(b.name))
                         .map((stem) => (
                           <ListItem key={stem.id} divider sx={{ pl: 4, pr: 6 }}>
-                            <Stack
-                              direction="row"
-                              spacing={4}
-                              sx={{ width: "100%" }}
-                            >
-                              <ListItemText
-                                primary={stem.name}
-                                secondary={stem.id}
-                              />
-                              <AudioPlayer filePath={stem.filePath} />
-                              {!stem.midiFile && (
-                                <Button
-                                  variant="outlined"
-                                  onClick={() =>
-                                    handcleToMidiConversion(stem.id)
-                                  }
-                                  disabled={midiConversionInProgress[stem.id]}
-                                >
-                                  {!midiConversionInProgress[stem.id] && (
-                                    <Typography variant="body1">
-                                      Get Midi
-                                    </Typography>
+                            <Stack direction="column" sx={{ width: "100%" }}>
+                              <Stack
+                                direction="row"
+                                spacing={4}
+                                sx={{ width: "100%" }}
+                              >
+                                <ListItemText
+                                  primary={stem.name}
+                                  secondary={stem.id}
+                                />
+                                <AudioPlayer filePath={stem.filePath} />
+                                <ButtonGroup variant="outlined">
+                                  {!stem.midiFile && (
+                                    <Button
+                                      variant="outlined"
+                                      onClick={() =>
+                                        handcleToMidiConversion(stem.id)
+                                      }
+                                      disabled={
+                                        midiConversionInProgress[stem.id]
+                                      }
+                                    >
+                                      {midiConversionInProgress[stem.id] ? (
+                                        <CircularProgress size={24} />
+                                      ) : (
+                                        "to Midi"
+                                      )}
+                                    </Button>
                                   )}
-                                  {midiConversionInProgress[stem.id] && (
-                                    <CircularProgress size={24} />
+                                  {stem.midiFile && (
+                                    <Button
+                                      variant="outlined"
+                                      onClick={() =>
+                                        handleDownloadMidi(stem.midiFile)
+                                      }
+                                      startIcon={<DownloadOutlined />}
+                                    >
+                                      {"Midi"}
+                                    </Button>
                                   )}
-                                </Button>
-                              )}
-                              {stem.midiFile && (
-                                <Button
-                                  variant="outlined"
-                                  onClick={() =>
-                                    handleDownloadMidi(stem.midiFile)
-                                  }
-                                  startIcon={<DownloadOutlined />}
+                                  {!stem.transcription && (
+                                    <Button
+                                      variant="outlined"
+                                      onClick={() => handleTranscribe(stem)}
+                                    >
+                                      Transcribe
+                                    </Button>
+                                  )}
+                                </ButtonGroup>
+                              </Stack>
+                              {stem.transcription && (
+                                <Stack
+                                  py={1}
+                                  direction="column"
+                                  sx={{ width: "100%" }}
+                                  spacing={1}
                                 >
-                                  Download
-                                </Button>
+                                  <Divider />
+                                  <Typography variant="h5">
+                                    Transcription
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {stem?.transcription?.text}
+                                  </Typography>
+                                </Stack>
                               )}
                             </Stack>
                           </ListItem>

@@ -11,20 +11,17 @@ This projects aims to provide a platform to manage music, stems and samples by p
 
 ## Architecture / Technologies Used
 
-- Frontend
-  - Web-Client (React)
-- Platform
-  - Identity-Provider / Authentication (Auth0)
-  - Updates Server => Client
-    - Server-Sent Events (SSE) / WebSockets
+![Architecture Overview](docs/assets/Architecture.svg)
+
+- Web-Client (React/Typescript)
+- Identity-Provider / Authentication (Auth0)
 - Backend
   - Information Flow: Client -> HTTP -> Gateway -> MQ -> Worker -> MQ -> Gateway -> SSE -> Client
-  - API Gateway: NodeJs + Express / Python + Django / NestJs
+  - API Gateway: NodeJs + Express
   - Message Broker: Redis
   - Services / Workers:
-    - Separation-Service (Demucs)
-    - Audio-To-Midi-Service (Basic-Pitch)
-    - Transcription-Service (OpenAI Whsiper)
-    - Sample-Split-Service (Librosa)
+    - Separation-Worker (Demucs)
+    - Audio-To-Midi-Worker (Basic-Pitch)
+    - Transcription-Worker (OpenAI Whsiper)
   - Object-Storage: Minio / S3
-  - Database: Postgres + ORM (Prisma/Drizzle)
+  - Database: Postgres (+Prisma ORM)
