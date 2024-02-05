@@ -1,8 +1,8 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { DownloadOutlined } from "@mui/icons-material";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
+  Box,
   Button,
   ButtonGroup,
   CircularProgress,
@@ -23,7 +23,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AudioPlayer } from "./components/AudioPlayer";
 import { FileUploadForm } from "./components/FileUploadForm";
-import { LogoutButton } from "./components/LogoutButton";
+import { MenuBar } from "./components/MenuBar";
 import { SSEComponent } from "./components/SSEComponent";
 import { axiosInstance, rawAxiosInstance } from "./lib";
 import { queryClient } from "./main";
@@ -39,7 +39,6 @@ interface MidiConversionState {
 }
 
 export const App = () => {
-  const { isAuthenticated } = useAuth0();
   const [selectedFile, setSelectedFile] = useState<AudioFileResponse | null>(
     null
   );
@@ -137,171 +136,177 @@ export const App = () => {
   };
 
   return (
-    <Stack direction="column" spacing={2} padding={2}>
-      <SSEComponent onMessage={onSSEMessage} />
-      <FileUploadForm
-        onFileUpload={() => {
-          queryClient.invalidateQueries({ queryKey: ["files"] });
-        }}
-      />
-      <Stack direction="row" spacing={2}>
-        <Select
-          sx={{ maxWidth: 400 }}
-          labelId="select-file-label"
-          id="select-file"
-          value={selectedFile?.id || ""}
-          onChange={(event) => {
-            const file = selectableFiles.find(
-              (f) => f.id === event.target.value
-            );
-            setSelectedFile(file || null);
+    <Stack direction="column" sx={{ padding: 0 }}>
+      <MenuBar />
+      <Box p={1}>
+        <SSEComponent onMessage={onSSEMessage} />
+        <FileUploadForm
+          onFileUpload={() => {
+            queryClient.invalidateQueries({ queryKey: ["files"] });
           }}
-        >
-          {selectableFiles.map((file) => (
-            <MenuItem key={file.id} value={file.id}>
-              {file.name}
-            </MenuItem>
-          ))}
-        </Select>
-        <ButtonGroup variant="outlined" aria-label="outlined button group">
-          <Button
-            onClick={handleFileSeparation}
-            disabled={separationInProgress}
+        />
+        <Stack direction="row" spacing={2}>
+          <Select
+            sx={{ maxWidth: 400 }}
+            labelId="select-file-label"
+            id="select-file"
+            value={selectedFile?.id || ""}
+            onChange={(event) => {
+              const file = selectableFiles.find(
+                (f) => f.id === event.target.value
+              );
+              setSelectedFile(file || null);
+            }}
           >
-            {!separationInProgress && (
-              <Typography variant="body1">Separate</Typography>
-            )}
-            {separationInProgress && <CircularProgress size={24} />}
+            {selectableFiles.map((file) => (
+              <MenuItem key={file.id} value={file.id}>
+                {file.name}
+              </MenuItem>
+            ))}
+          </Select>
+          <ButtonGroup variant="outlined" aria-label="outlined button group">
+            <Button
+              onClick={handleFileSeparation}
+              disabled={separationInProgress}
+            >
+              {!separationInProgress && (
+                <Typography variant="body1">Separate</Typography>
+              )}
+              {separationInProgress && <CircularProgress size={24} />}
+            </Button>
+          </ButtonGroup>
+        </Stack>
+        <Stack direction="row" spacing={2} paddingTop={2}>
+          <Typography variant="h5">Files</Typography>
+          <Button variant="outlined" onClick={() => refetch()}>
+            Refresh
           </Button>
-          {isAuthenticated && <LogoutButton />}
-        </ButtonGroup>
-      </Stack>
-      <Stack direction="row" spacing={2} paddingTop={2}>
-        <Typography variant="h5">Files</Typography>
-        <Button variant="outlined" onClick={() => refetch()}>
-          Refresh
-        </Button>
-      </Stack>
-      {files && (
-        <List dense>
-          {files.length > 0 &&
-            files
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .map((file) => (
-                <div key={file.id}>
-                  <ListItem
-                    key={file.id}
-                    divider
-                    alignItems="center"
-                    secondaryAction={
-                      file.stems &&
-                      file.stems.length > 0 && (
-                        <IconButton
-                          edge="end"
-                          aria-label="toggle stems"
-                          onClick={() => toggleStems(file.id)}
-                        >
-                          {openStems[file.id] ? (
-                            <ExpandLessIcon />
-                          ) : (
-                            <ExpandMoreIcon />
-                          )}
-                        </IconButton>
-                      )
-                    }
-                  >
-                    <ListItemText primary={file.name} secondary={file.id} />
-                    <AudioPlayer filePath={file.filePath} />
-                  </ListItem>
-                  <Collapse
-                    in={openStems[file.id] ?? false}
-                    timeout="auto"
-                    unmountOnExit
-                  >
-                    <List dense>
-                      {file.stems
-                        ?.sort((a, b) => a.name.localeCompare(b.name))
-                        .map((stem) => (
-                          <ListItem key={stem.id} divider sx={{ pl: 4, pr: 6 }}>
-                            <Stack direction="column" sx={{ width: "100%" }}>
-                              <Stack
-                                direction="row"
-                                spacing={4}
-                                sx={{ width: "100%" }}
-                              >
-                                <ListItemText
-                                  primary={stem.name}
-                                  secondary={stem.id}
-                                />
-                                <AudioPlayer filePath={stem.filePath} />
-                                <ButtonGroup variant="outlined">
-                                  {!stem.midiFile && (
-                                    <Button
-                                      variant="outlined"
-                                      onClick={() =>
-                                        handcleToMidiConversion(stem.id)
-                                      }
-                                      disabled={
-                                        midiConversionInProgress[stem.id]
-                                      }
-                                    >
-                                      {midiConversionInProgress[stem.id] ? (
-                                        <CircularProgress size={24} />
-                                      ) : (
-                                        "to Midi"
-                                      )}
-                                    </Button>
-                                  )}
-                                  {stem.midiFile && (
-                                    <Button
-                                      variant="outlined"
-                                      onClick={() =>
-                                        handleDownloadMidi(stem.midiFile)
-                                      }
-                                      startIcon={<DownloadOutlined />}
-                                    >
-                                      {"Midi"}
-                                    </Button>
-                                  )}
-                                  {!stem.transcription && (
-                                    <Button
-                                      variant="outlined"
-                                      onClick={() => handleTranscribe(stem)}
-                                    >
-                                      Transcribe
-                                    </Button>
-                                  )}
-                                </ButtonGroup>
-                              </Stack>
-                              {stem.transcription && (
+        </Stack>
+        {files && (
+          <List dense>
+            {files.length > 0 &&
+              files
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((file) => (
+                  <div key={file.id}>
+                    <ListItem
+                      key={file.id}
+                      divider
+                      alignItems="center"
+                      secondaryAction={
+                        file.stems &&
+                        file.stems.length > 0 && (
+                          <IconButton
+                            edge="end"
+                            aria-label="toggle stems"
+                            onClick={() => toggleStems(file.id)}
+                          >
+                            {openStems[file.id] ? (
+                              <ExpandLessIcon />
+                            ) : (
+                              <ExpandMoreIcon />
+                            )}
+                          </IconButton>
+                        )
+                      }
+                    >
+                      <ListItemText primary={file.name} secondary={file.id} />
+                      <AudioPlayer filePath={file.filePath} />
+                    </ListItem>
+                    <Collapse
+                      in={openStems[file.id] ?? false}
+                      timeout="auto"
+                      unmountOnExit
+                    >
+                      <List dense>
+                        {file.stems
+                          ?.sort((a, b) => a.name.localeCompare(b.name))
+                          .map((stem) => (
+                            <ListItem
+                              key={stem.id}
+                              divider
+                              sx={{ pl: 4, pr: 6 }}
+                            >
+                              <Stack direction="column" sx={{ width: "100%" }}>
                                 <Stack
-                                  py={1}
-                                  direction="column"
+                                  direction="row"
+                                  spacing={4}
                                   sx={{ width: "100%" }}
-                                  spacing={1}
                                 >
-                                  <Divider />
-                                  <Typography variant="h5">
-                                    Transcription
-                                  </Typography>
-                                  <Typography variant="body2">
-                                    {stem?.transcription?.text}
-                                  </Typography>
+                                  <ListItemText
+                                    primary={stem.name}
+                                    secondary={stem.id}
+                                  />
+                                  <AudioPlayer filePath={stem.filePath} />
+                                  <ButtonGroup variant="outlined">
+                                    {!stem.midiFile && (
+                                      <Button
+                                        variant="outlined"
+                                        onClick={() =>
+                                          handcleToMidiConversion(stem.id)
+                                        }
+                                        disabled={
+                                          midiConversionInProgress[stem.id]
+                                        }
+                                      >
+                                        {midiConversionInProgress[stem.id] ? (
+                                          <CircularProgress size={24} />
+                                        ) : (
+                                          "to Midi"
+                                        )}
+                                      </Button>
+                                    )}
+                                    {stem.midiFile && (
+                                      <Button
+                                        variant="outlined"
+                                        onClick={() =>
+                                          handleDownloadMidi(stem.midiFile)
+                                        }
+                                        startIcon={<DownloadOutlined />}
+                                      >
+                                        {"Midi"}
+                                      </Button>
+                                    )}
+                                    {!stem.transcription && (
+                                      <Button
+                                        variant="outlined"
+                                        onClick={() => handleTranscribe(stem)}
+                                      >
+                                        Transcribe
+                                      </Button>
+                                    )}
+                                  </ButtonGroup>
                                 </Stack>
-                              )}
-                            </Stack>
-                          </ListItem>
-                        ))}
-                    </List>
-                  </Collapse>
-                </div>
-              ))}
-          {files.length === 0 && (
-            <Typography variant="body1">No files found.</Typography>
-          )}
-        </List>
-      )}
-      {isLoading && <CircularProgress />}
+                                {stem.transcription && (
+                                  <Stack
+                                    py={1}
+                                    direction="column"
+                                    sx={{ width: "100%" }}
+                                    spacing={1}
+                                  >
+                                    <Divider />
+                                    <Typography variant="h5">
+                                      Transcription
+                                    </Typography>
+                                    <Typography variant="body2">
+                                      {stem?.transcription?.text}
+                                    </Typography>
+                                  </Stack>
+                                )}
+                              </Stack>
+                            </ListItem>
+                          ))}
+                      </List>
+                    </Collapse>
+                  </div>
+                ))}
+            {files.length === 0 && (
+              <Typography variant="body1">No files found.</Typography>
+            )}
+          </List>
+        )}
+        {isLoading && <CircularProgress />}
+      </Box>
     </Stack>
   );
 };
