@@ -1,8 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { CircularProgress } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { axiosInstance } from ".";
-import { TokenContext } from "./TokenContext";
+import { TokenContext } from "../contexts/TokenContext";
+import { axiosInstance } from "../lib";
 
 export const AxiosProvider = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();

@@ -44,6 +44,7 @@ export const FileUploadForm = ({ onFileUpload }: Props) => {
           }}
         />
         <Button
+          disabled={!file}
           variant="outlined"
           startIcon={<CloudUploadOutlined />}
           onClick={handleFileUpload}

@@ -1,7 +1,7 @@
 import { Button, Stack, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useAccessToken } from "../contexts/TokenContext";
 import { axiosInstance } from "../lib";
-import { useAccessToken } from "../lib/TokenContext";
 
 interface Props {
   onMessage: (message: string, toggleSeparationProgres: boolean) => void;

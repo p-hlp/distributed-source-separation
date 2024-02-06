@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { SSEContext, SSEContextValue } from "../contexts/SSEContext";
 
 /**
  * Opens an EventSource connection to the API Gateway on the given endpoint.
@@ -27,4 +28,13 @@ export const useSSE = (endpoint: string) => {
   }, [endpoint]);
 
   return null;
+};
+
+// Hook for consuming the context
+export const useSSEContext = (): SSEContextValue => {
+  const context = useContext(SSEContext);
+  if (context === undefined) {
+    throw new Error("useSSEContext must be used within an SSEProvider");
+  }
+  return context;
 };

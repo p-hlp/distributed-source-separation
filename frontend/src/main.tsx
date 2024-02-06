@@ -20,6 +20,7 @@ import { ToastContainer } from "react-toastify";
 import { App } from "./App";
 import "./global.css";
 import { AxiosProvider } from "./lib";
+import { SSEProvider } from "./providers/SSEProvider";
 
 const rootRoute = createRootRoute();
 
@@ -61,16 +62,18 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <AxiosProvider>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={darkTheme}>
-            <CssBaseline />
-            <RouterProvider router={router} />
-            <ToastContainer
-              theme="dark"
-              position="top-center"
-              closeOnClick
-              autoClose={3000}
-              hideProgressBar
-            />
-            <ReactQueryDevtools initialIsOpen={false} />
+            <SSEProvider>
+              <CssBaseline />
+              <RouterProvider router={router} />
+              <ToastContainer
+                theme="dark"
+                position="top-center"
+                closeOnClick
+                autoClose={3000}
+                hideProgressBar
+              />
+              <ReactQueryDevtools initialIsOpen={false} />
+            </SSEProvider>
           </ThemeProvider>
         </QueryClientProvider>
       </AxiosProvider>

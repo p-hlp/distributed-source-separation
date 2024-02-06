@@ -1,2 +1,2 @@
-export * from "./AxiosProvider";
+export * from "../providers/AxiosProvider";
 export * from "./axios";
