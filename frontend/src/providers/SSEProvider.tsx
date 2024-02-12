@@ -27,6 +27,12 @@ export const SSEProvider = ({ children }: SSEProviderProps) => {
     const es = new EventSource(endpoint);
     setEventSource(es);
 
+    es.addEventListener("message", (event) => {
+      console.log("Message event", event);
+      const data = JSON.parse(event.data);
+      console.log("Event data", data);
+    });
+
     return () => {
       es.close();
       console.log("Shared SSE connection closed");

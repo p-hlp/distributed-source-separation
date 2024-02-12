@@ -9,7 +9,6 @@ import {
   ButtonGroup,
   CircularProgress,
   Collapse,
-  Divider,
   IconButton,
   List,
   ListItem,
@@ -81,57 +80,64 @@ export const FileList: React.FC<FileListProps> = ({
                   .map((stem) => (
                     <ListItem key={stem.id} divider sx={{ pl: 4, pr: 6 }}>
                       <Stack
-                        direction="row"
-                        spacing={2}
-                        alignItems="center"
+                        direction="column"
                         sx={{ width: "100%" }}
+                        alignItems="center"
                       >
-                        <ListItemText primary={stem.name} />
-                        <AudioPlayer filePath={stem.filePath} />
-                        <ButtonGroup variant="outlined">
-                          {!stem.midiFile && (
-                            <Button
-                              variant="outlined"
-                              onClick={() => handleToMidiConversion(stem.id)}
-                              disabled={midiConversionInProgress[stem.id]}
-                            >
-                              {midiConversionInProgress[stem.id] ? (
-                                <CircularProgress size={24} />
-                              ) : (
-                                "to Midi"
-                              )}
-                            </Button>
-                          )}
-                          {stem.midiFile && (
-                            <Button
-                              variant="outlined"
-                              onClick={() => handleDownloadMidi(stem.midiFile)}
-                              startIcon={<DownloadOutlined />}
-                            >
-                              Midi
-                            </Button>
-                          )}
-                          {!stem.transcription && (
-                            <Button
-                              variant="outlined"
-                              onClick={() => handleTranscribe(stem)}
-                            >
-                              Transcribe
-                            </Button>
-                          )}
-                        </ButtonGroup>
+                        <Stack
+                          direction="row"
+                          spacing={2}
+                          alignItems="center"
+                          sx={{ width: "100%" }}
+                        >
+                          <ListItemText primary={stem.name} />
+                          <AudioPlayer filePath={stem.filePath} />
+                          <ButtonGroup variant="outlined">
+                            {!stem.midiFile && (
+                              <Button
+                                variant="outlined"
+                                onClick={() => handleToMidiConversion(stem.id)}
+                                disabled={midiConversionInProgress[stem.id]}
+                              >
+                                {midiConversionInProgress[stem.id] ? (
+                                  <CircularProgress size={24} />
+                                ) : (
+                                  "to Midi"
+                                )}
+                              </Button>
+                            )}
+                            {stem.midiFile && (
+                              <Button
+                                variant="outlined"
+                                onClick={() =>
+                                  handleDownloadMidi(stem.midiFile)
+                                }
+                                startIcon={<DownloadOutlined />}
+                              >
+                                Midi
+                              </Button>
+                            )}
+                            {!stem.transcription && (
+                              <Button
+                                variant="outlined"
+                                onClick={() => handleTranscribe(stem)}
+                              >
+                                Transcribe
+                              </Button>
+                            )}
+                          </ButtonGroup>
+                        </Stack>
+                        {stem.transcription && (
+                          <Box>
+                            <Typography variant="h6" sx={{ pt: 1 }}>
+                              Transcription
+                            </Typography>
+                            <Typography variant="body2">
+                              {stem.transcription.text}
+                            </Typography>
+                          </Box>
+                        )}
                       </Stack>
-                      {stem.transcription && (
-                        <Box py={1}>
-                          <Divider />
-                          <Typography variant="h6" sx={{ pt: 1 }}>
-                            Transcription
-                          </Typography>
-                          <Typography variant="body2">
-                            {stem.transcription.text}
-                          </Typography>
-                        </Box>
-                      )}
                     </ListItem>
                   ))}
               </List>
