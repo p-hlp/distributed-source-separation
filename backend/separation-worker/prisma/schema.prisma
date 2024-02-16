@@ -1,0 +1,60 @@
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = "5"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AudioFile {
+  id              String         @id @default(uuid())
+  name            String
+  filePath        String
+  userId          String
+  fileType        String
+  parentId        String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  waveform        Json?
+  AudioFile       AudioFile?     @relation("AudioFileToAudioFile", fields: [parentId], references: [id])
+  other_AudioFile AudioFile[]    @relation("AudioFileToAudioFile")
+  User            User           @relation(fields: [userId], references: [id])
+  MidiFile        MidiFile?
+  Transcription   Transcription?
+}
+
+model MidiFile {
+  id          String    @id @default(uuid())
+  name        String
+  userId      String
+  filePath    String
+  fileType    String    @default("mid")
+  audioFileId String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  AudioFile   AudioFile @relation(fields: [audioFileId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
+}
+
+model Transcription {
+  id          String    @id @default(uuid())
+  text        String
+  userId      String
+  audioFileId String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  AudioFile   AudioFile @relation(fields: [audioFileId], references: [id])
+  User        User      @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id            String          @id @default(uuid())
+  auth0Id       String          @unique
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  AudioFile     AudioFile[]
+  MidiFile      MidiFile[]
+  Transcription Transcription[]
+}

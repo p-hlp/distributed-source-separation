@@ -19,6 +19,7 @@ import {
 } from "./lib/queue";
 import { authenticate, createOrAddUser } from "./middleware";
 import { tokenParamToHeader } from "./middleware/tokenParamToHeader.middleware";
+import { generateWaveFormJson } from "./shared/fsUtils";
 import { RawFile, getFileType, parseMultipartReq } from "./shared/httpUtils";
 
 const port = process.env.PORT;
@@ -196,8 +197,11 @@ const startUp = async () => {
     const extension = mime.extension(rawFile.info.mimeType);
     const objectKey = uuid();
     const fileName = `${user.id}/${objectKey}.${extension}`;
+    const bucketName = process.env.MINIO_DEFAULT_BUCKET || "audio";
+
+    // Upload the file to minio
     const response = await minioClient.putObject(
-      process.env.MINIO_DEFAULT_BUCKET || "audio",
+      bucketName,
       fileName,
       rawFile.data,
       undefined,
@@ -211,6 +215,9 @@ const startUp = async () => {
     if (!fileType)
       return res.status(400).json({ message: "Unsupported file type" });
 
+    const waveform = await generateWaveFormJson(rawFile, objectKey, fileType);
+
+    // Save the file to the database
     const audio = await prisma.audioFile.create({
       data: {
         name: rawFile.info.filename,
@@ -221,9 +228,10 @@ const startUp = async () => {
             id: user.id,
           },
         },
+        waveform: waveform,
       },
     });
-    res.status(200).json({ audio });
+    res.status(200).json({ id: audio.id });
   });
 
   app.get("/files", async (req: Request, res: Response) => {
