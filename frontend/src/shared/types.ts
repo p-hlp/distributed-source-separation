@@ -20,6 +20,16 @@ const TranscriptionSchema = z.object({
   updatedAt: z.string(),
 });
 
+const WavefromDataSchema = z.object({
+  bits: z.number(),
+  length: z.number(),
+  sample_rate: z.number(),
+  samples_per_pixel: z.number(),
+  channels: z.number(),
+  version: z.number(),
+  data: z.array(z.number()),
+});
+
 const StemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -31,11 +41,14 @@ const StemSchema = z.object({
   updatedAt: z.string(),
   midiFile: MidiFileSchema.optional(),
   transcription: TranscriptionSchema.optional(),
+  waveform: WavefromDataSchema,
 });
 
 const AudioFileSchema = StemSchema.extend({
   stems: z.array(StemSchema).optional(),
 });
+
+export type WaveformData = z.infer<typeof WavefromDataSchema>;
 
 export type TranscriptionResponse = z.infer<typeof TranscriptionSchema>;
 

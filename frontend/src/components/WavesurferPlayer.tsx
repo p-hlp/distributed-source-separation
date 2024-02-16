@@ -198,7 +198,6 @@ export const WavesurferPlayer = memo((props: WavesurferProps): ReactElement => {
   // Create a container div
   return <div ref={containerRef} />;
 });
-
 /**
  * @public
  */
