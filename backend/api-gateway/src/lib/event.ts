@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { EventResponse } from "../types/event";
+import { EventResponse } from "../types";
 
 export const sseConnections = new Map<string, Response>();
 
