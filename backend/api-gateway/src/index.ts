@@ -8,6 +8,7 @@ import helmet from "helmet";
 import mime from "mime-types";
 import { v4 as uuid } from "uuid";
 import { prisma } from "./lib";
+import { sendEvent, sseConnections } from "./lib/event";
 import { initMinioDefaultBucket, minioClient } from "./lib/minio";
 import {
   audioToMidiQueue,
@@ -21,41 +22,14 @@ import { authenticate, createOrAddUser } from "./middleware";
 import { tokenParamToHeader } from "./middleware/tokenParamToHeader.middleware";
 import { generateWaveFormJson } from "./shared/fsUtils";
 import { RawFile, getFileType, parseMultipartReq } from "./shared/httpUtils";
+import { EventType } from "./types/event";
+import {
+  CompletedQueueResult,
+  FailedQueueResult,
+  QueueJobStatus,
+} from "./types/queue";
 
 const port = process.env.PORT;
-
-const sseConnections = new Map<string, Response>();
-
-const sendEvent = (res: Response, data: EventResponse) => {
-  res.write(`data: ${JSON.stringify(data)}\n\n`);
-};
-
-type QueueJobStatus = "done" | "inProgress" | "failed";
-
-enum EventType {
-  separate = "separate",
-  audioToMidi = "audioToMidi",
-  transcribe = "transcribe",
-  message = "message",
-}
-
-interface CompletedQueueResult {
-  userId: string;
-  audioFileId: string;
-  status: QueueJobStatus;
-  progress?: number;
-}
-
-type FailedQueueResult = CompletedQueueResult & { error: string };
-
-interface EventResponse {
-  type: EventType;
-  status: QueueJobStatus;
-  jobId?: string;
-  audioFileId?: string;
-  error?: string;
-  message?: string;
-}
 
 const startUp = async () => {
   const app: Express = express();
@@ -167,7 +141,6 @@ const startUp = async () => {
   });
 
   app.get("/events", (req: Request, res: Response) => {
-    // Initialie SSE connection with `clientId`
     const clientId = req.user?.id;
     if (!clientId) return res.status(401).send("Unauthorized");
 
