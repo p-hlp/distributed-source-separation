@@ -7,27 +7,36 @@ import express, { Express, Request, Response } from "express";
 import helmet from "helmet";
 import mime from "mime-types";
 import { v4 as uuid } from "uuid";
-import { prisma } from "./lib";
-import { sendEvent, sseConnections } from "./lib/event";
-import { initMinioDefaultBucket, minioClient } from "./lib/minio";
 import {
   audioToMidiQueue,
   audioToMidiQueueEvents,
+  initMinioDefaultBucket,
+  minioClient,
+  prisma,
+  sendEvent,
   separateQueue,
   separateQueueEvents,
+  sseConnections,
   transcribeQueue,
   transcribeQueueEvents,
-} from "./lib/queue";
-import { authenticate, createOrAddUser } from "./middleware";
-import { tokenParamToHeader } from "./middleware/tokenParamToHeader.middleware";
-import { generateWaveFormJson } from "./shared/fsUtils";
-import { RawFile, getFileType, parseMultipartReq } from "./shared/httpUtils";
-import { EventType } from "./types/event";
+} from "./lib";
+import {
+  authenticate,
+  createOrAddUser,
+  tokenParamToHeader,
+} from "./middleware";
+import {
+  RawFile,
+  generateWaveFormJson,
+  getFileType,
+  parseMultipartReq,
+} from "./shared";
 import {
   CompletedQueueResult,
+  EventType,
   FailedQueueResult,
   QueueJobStatus,
-} from "./types/queue";
+} from "./types";
 
 const port = process.env.PORT;
 
@@ -152,13 +161,10 @@ const startUp = async () => {
       "access-control-allow-origin": "*",
     });
 
-    // Store the response object so we can send data to it later
     sseConnections.set(clientId, res);
 
-    // Send a comment to the client, so it knows the connection was established
     res.write(":ok\n\n");
 
-    // When the client closes the connection, remove the corresponding response object
     req.on("close", () => {
       console.log("Client closed connection", clientId);
       sseConnections.delete(clientId);
