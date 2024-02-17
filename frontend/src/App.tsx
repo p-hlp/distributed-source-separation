@@ -2,11 +2,12 @@
 
 import { Box, CircularProgress, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FileListWavesurfer } from "./components/FileListWavesurfer";
 import { FileSelection } from "./components/FileSelection";
 import { FileUploadForm } from "./components/FileUploadForm";
 import { MenuBar } from "./components/MenuBar";
+import { useRegisterSSEListener } from "./hooks/useRegisterSSEListener";
 import { axiosInstance, rawAxiosInstance } from "./lib";
 import { queryClient } from "./main";
 import { AudioFileResponse, MidiFileResponse } from "./shared/types";
@@ -47,8 +48,6 @@ export const App = () => {
     if (!selectedFile) return;
     setSeparationInProgress(true);
     await axiosInstance.post("/separate", { data: selectedFile.id });
-    setSeparationInProgress(false);
-    queryClient.invalidateQueries({ queryKey: ["files"] });
   };
 
   const toggleMidiConversion = (fileId: string) => {
@@ -87,12 +86,25 @@ export const App = () => {
     refetch();
   };
 
-  const toggleStems = (fileId: string) => {
+  const toggleStems = useCallback((fileId: string) => {
     setOpenStems((prev) => ({
       ...prev,
       [fileId]: !prev[fileId],
     }));
-  };
+  }, []);
+
+  const separationHandler = useCallback(() => {
+    setSeparationInProgress(false);
+    queryClient.invalidateQueries({ queryKey: ["files"] });
+  }, []);
+
+  useRegisterSSEListener([
+    {
+      type: "separate",
+      status: "done",
+      callback: separationHandler,
+    },
+  ]);
 
   return (
     <Stack direction="column" sx={{ padding: 0 }}>

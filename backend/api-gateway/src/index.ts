@@ -26,18 +26,36 @@ const port = process.env.PORT;
 
 const sseConnections = new Map<string, Response>();
 
-const sendEvent = <T>(res: Response, data: T) => {
+const sendEvent = (res: Response, data: EventResponse) => {
   res.write(`data: ${JSON.stringify(data)}\n\n`);
 };
+
+type QueueJobStatus = "done" | "inProgress" | "failed";
+
+enum EventType {
+  separate = "separate",
+  audioToMidi = "audioToMidi",
+  transcribe = "transcribe",
+  message = "message",
+}
 
 interface CompletedQueueResult {
   userId: string;
   audioFileId: string;
-  status: "done" | "inProgress" | "failed";
+  status: QueueJobStatus;
   progress?: number;
 }
 
 type FailedQueueResult = CompletedQueueResult & { error: string };
+
+interface EventResponse {
+  type: EventType;
+  status: QueueJobStatus;
+  jobId?: string;
+  audioFileId?: string;
+  error?: string;
+  message?: string;
+}
 
 const startUp = async () => {
   const app: Express = express();
@@ -61,7 +79,7 @@ const startUp = async () => {
       jobId: result.jobId,
       audioFileId: completedResult.audioFileId,
       status: completedResult.status,
-      event: "separate",
+      type: EventType.separate,
     };
     const sseResponse = sseConnections.get(clientId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -77,7 +95,7 @@ const startUp = async () => {
       audioFileId: failedResult.audioFileId,
       status: failedResult.status,
       error: failedResult.error,
-      event: "separate",
+      type: EventType.separate,
     };
     const sseResponse = sseConnections.get(failedResult.userId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -93,7 +111,7 @@ const startUp = async () => {
       jobId: result.jobId,
       audioFileId: completedResult.audioFileId,
       status: completedResult.status,
-      event: "audioToMidi",
+      type: EventType.audioToMidi,
     };
     const sseResponse = sseConnections.get(clientId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -109,7 +127,7 @@ const startUp = async () => {
       audioFileId: failedResult.audioFileId,
       status: failedResult.status,
       error: failedResult.error,
-      event: "separate",
+      type: EventType.audioToMidi,
     };
     const sseResponse = sseConnections.get(failedResult.userId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -125,7 +143,7 @@ const startUp = async () => {
       jobId: result.jobId,
       audioFileId: completedResult.audioFileId,
       status: completedResult.status,
-      event: "transcribe",
+      type: EventType.transcribe,
     };
     const sseResponse = sseConnections.get(clientId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -141,7 +159,7 @@ const startUp = async () => {
       audioFileId: failedResult.audioFileId,
       status: failedResult.status,
       error: failedResult.error,
-      event: "transcribe",
+      type: EventType.transcribe,
     };
     const sseResponse = sseConnections.get(failedResult.userId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -180,8 +198,9 @@ const startUp = async () => {
     if (!clientId) return res.status(401).send("Unauthorized");
     console.log("Sending message to client", message);
     const response = {
-      event: "message",
-      message,
+      type: EventType.message,
+      status: "done" as QueueJobStatus,
+      message: message as string,
     };
     const sseResponse = sseConnections.get(clientId);
     if (sseResponse) sendEvent(sseResponse, response);

@@ -1,6 +1,4 @@
-// SSEContext.tsx
-
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { SSEContext } from "../contexts/SSEContext";
 import { useAccessToken } from "../contexts/TokenContext";
 
@@ -15,32 +13,50 @@ const buildUrl = (endpoint: string, token: string): string => {
 };
 
 export const SSEProvider = ({ children }: SSEProviderProps) => {
-  const { accessToken } = useAccessToken();
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
+  const eventSourceInitialized = useRef(false);
+  const { accessToken } = useAccessToken();
 
   useEffect(() => {
-    if (!accessToken || eventSource) return; // Avoid creating multiple connections
+    if (!accessToken || eventSourceInitialized.current) return;
 
     const endpoint = buildUrl("/events", accessToken);
-    console.log("Creating shared SSE connection to", endpoint);
-
     const es = new EventSource(endpoint);
-    setEventSource(es);
+    const messageHandler = (event: MessageEvent<unknown>) => {
+      console.log(event);
+    };
+    es.addEventListener("message", messageHandler);
 
-    es.addEventListener("message", (event) => {
-      console.log("Message event", event);
-      const data = JSON.parse(event.data);
-      console.log("Event data", data);
-    });
+    console.log("EventSource connected.");
+    setEventSource(es);
+    eventSourceInitialized.current = true;
 
     return () => {
+      console.log("EventSource disconnected.");
       es.close();
-      console.log("Shared SSE connection closed");
+      setEventSource(null);
+      eventSourceInitialized.current = false;
     };
-  }, [accessToken, eventSource]);
+  }, [accessToken]); // Depend only on accessToken
+
+  const addEventListener = useCallback(
+    (type: string, listener: (event: MessageEvent<unknown>) => void) => {
+      eventSource?.addEventListener(type, listener);
+    },
+    [eventSource]
+  );
+
+  const removeEventListener = useCallback(
+    (type: string, listener: (event: MessageEvent<unknown>) => void) => {
+      eventSource?.removeEventListener(type, listener);
+    },
+    [eventSource]
+  );
 
   return (
-    <SSEContext.Provider value={{ eventSource }}>
+    <SSEContext.Provider
+      value={{ eventSource, addEventListener, removeEventListener }}
+    >
       {children}
     </SSEContext.Provider>
   );
