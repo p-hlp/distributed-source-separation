@@ -3,7 +3,7 @@
 import { Box, CircularProgress, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { FileListWavesurfer } from "./components/FileListWavesurfer";
+import { FileList } from "./components/FileList";
 import { FileSelection } from "./components/FileSelection";
 import { FileUploadForm } from "./components/FileUploadForm";
 import { MenuBar } from "./components/MenuBar";
@@ -130,7 +130,7 @@ export const App = () => {
         {isLoading ? (
           <CircularProgress />
         ) : (
-          <FileListWavesurfer
+          <FileList
             files={files || []}
             openStems={openStems}
             toggleStems={toggleStems}

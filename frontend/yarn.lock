@@ -1026,6 +1026,11 @@
     "@types/babel__core" "^7.20.5"
     react-refresh "^0.14.0"
 
+"@wavesurfer/react@1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@wavesurfer/react/-/react-1.0.4.tgz#577bf84152bd25bd7ba6635a5b1694a57e6f6161"
+  integrity sha512-6WkXLhh0EaytyK1B6JqHZmzHQlBz+nbGH5x009tUH6nUIFFXq7zwkDEXqeZuWyVTKgjqcOQGOgavSZ7EbsS6lA==
+
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
@@ -2011,7 +2016,7 @@ react-refresh@^0.14.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.0.tgz#4e02825378a5f227079554d4284889354e5f553e"
   integrity sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==
 
-react-toastify@^10.0.4:
+react-toastify@10.0.4:
   version "10.0.4"
   resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-10.0.4.tgz#6ecdbbf923a07fc45850e69b0566efc7bf733283"
   integrity sha512-etR3RgueY8pe88SA67wLm8rJmL1h+CLqUGHuAoNsseW35oTGJEri6eBTyaXnFKNQ80v/eO10hBYLgz036XRGgA==
