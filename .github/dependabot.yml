@@ -10,6 +10,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/backend/api" # Location of package manifests
+    directory: "/backend/api-gateway" # Location of package manifests
     schedule:
       interval: "daily"
