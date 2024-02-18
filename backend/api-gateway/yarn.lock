@@ -352,10 +352,10 @@ buffer-from@^1.0.0:
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.2.tgz#2b146a6fd72e80b4f55d255f35ed59a3a9a41bd5"
   integrity sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==
 
-bullmq@5.1.4:
-  version "5.1.4"
-  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-5.1.4.tgz#cda7f400be2e03be778184ce45cee46eace39307"
-  integrity sha512-j/AjaPc8BhyrH7b2MyZpi4cUtGH8TJTxonZUmXEefmKU8z5DcldzmlXPief0P4+qvN0A7qwWZH3n0F+GsWgQkg==
+bullmq@5.2.1:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/bullmq/-/bullmq-5.2.1.tgz#a238b0bd9b45c26e06ee29a5bfe2b3cd52d9dca9"
+  integrity sha512-uImDp9k4hiitA1Ve5W/7AlOAaHMXwLtM2gPay7X7O6Do0LlXHW5fD4M0SthBtZLhECBQtZCCvzJcd2COoCi40g==
   dependencies:
     cron-parser "^4.6.0"
     glob "^8.0.3"
