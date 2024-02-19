@@ -27,11 +27,12 @@ model AudioFile {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   waveform      Json?
-  parent        AudioFile?     @relation("ParentAudioFile", fields: [parentId], references: [id])
+  parent        AudioFile?     @relation("ParentAudioFile", fields: [parentId], references: [id], onDelete: Cascade)
   stems         AudioFile[]    @relation("ParentAudioFile")
-  user          User           @relation(fields: [userId], references: [id])
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   midiFile      MidiFile?
   transcription Transcription?
+  slices        Slice[]        
 }
 
 model MidiFile {
@@ -43,8 +44,8 @@ model MidiFile {
   audioFileId String    @unique
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  audioFile   AudioFile @relation(fields: [audioFileId], references: [id])
-  user        User      @relation(fields: [userId], references: [id])
+  audioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Transcription {
@@ -54,6 +55,19 @@ model Transcription {
   audioFileId String    @unique
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  audioFile   AudioFile @relation(fields: [audioFileId], references: [id])
-  user        User      @relation(fields: [userId], references: [id])
+  audioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Slice {
+  id          String    @id @default(uuid())
+  sliceId     String    @unique
+  name        String
+  start       Float
+  end         Float?
+  color       String
+  audioFileId String    
+  audioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
