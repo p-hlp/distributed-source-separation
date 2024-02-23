@@ -35,12 +35,11 @@ import {
 import { removeFileExtension } from "./shared/stringUtils";
 import {
   CompletedQueueResult,
+  ENV,
   EventType,
   FailedQueueResult,
   QueueJobStatus,
 } from "./types";
-
-const port = process.env.PORT;
 
 const startUp = async () => {
   const app: Express = express();
@@ -197,7 +196,7 @@ const startUp = async () => {
     const extension = mime.extension(rawFile.info.mimeType);
     const objectKey = uuid();
     const fileName = `${user.id}/${objectKey}.${extension}`;
-    const bucketName = process.env.MINIO_DEFAULT_BUCKET || "audio";
+    const bucketName = ENV.MINIO_DEFAULT_BUCKET;
 
     // Upload the file to minio
     const response = await minioClient.putObject(
@@ -381,7 +380,7 @@ const startUp = async () => {
     const expiry = 60 * 60 * 24;
     minioClient.presignedUrl(
       "GET",
-      process.env.MINIO_DEFAULT_BUCKET || "audio",
+      ENV.MINIO_DEFAULT_BUCKET,
       filePath,
       expiry,
       (err, url) => {
@@ -437,8 +436,10 @@ const startUp = async () => {
     res.status(200).json({ message: "Hello world" });
   });
 
-  app.listen(port, () => {
-    console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  app.listen(ENV.PORT, () => {
+    console.log(
+      `⚡️[server]: Server is running at http://localhost:${ENV.PORT}`
+    );
   });
 };
 
