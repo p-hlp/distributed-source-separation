@@ -26,14 +26,16 @@ import {
 import { useEffect, useState } from "react";
 import { CreateLibraryModal } from "./components/CreateLibraryModal";
 import { MenuBar } from "./components/MenuBar";
+import useAppBarHeight from "./hooks/useAppBarHeight";
 import { axiosInstance } from "./lib";
-import { LibraryPage } from "./pages/LibraryPage";
+import { LibraryContainer } from "./pages/LibraryContainer";
 import { Library, LibraryResponse } from "./types/apiTypes";
 
 const RootComponent = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const barHeight = useAppBarHeight();
 
   // TODO - use activeLibrary to pass title to MenuBar
   const [activeLibrary, setActiveLibrary] = useState<undefined | Library>(
@@ -67,7 +69,7 @@ const RootComponent = () => {
 
   if (!libraries) return null;
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", height: "100%", widht: "100%" }}>
       <MenuBar />
       <Drawer
         variant="permanent"
@@ -88,7 +90,7 @@ const RootComponent = () => {
                 <ListItemIcon>
                   <LibraryAddOutlined />
                 </ListItemIcon>
-                <ListItemText primary={"Library"} />
+                <ListItemText primary={"Create Library"} />
               </ListItemButton>
             </ListItem>
           </List>
@@ -100,17 +102,21 @@ const RootComponent = () => {
                   <ListItemIcon>
                     <LibraryMusicOutlined />
                   </ListItemIcon>
-                  <ListItemText
-                    primary={lib.name}
-                    secondary={lib.description}
-                  />
+                  <ListItemText primary={lib.name} />
                 </ListItemButton>
               </ListItem>
             ))}
           </List>
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, mt: 8, p: 2 }}>
+      <Box
+        component="main"
+        sx={{
+          height: `calc(100% - ${barHeight}px)`,
+          width: "100%",
+          pt: `${barHeight}px`,
+        }}
+      >
         <Outlet />
         <CreateLibraryModal open={open} handleClose={handleClose} />
       </Box>
@@ -130,7 +136,7 @@ const indexRoute = createRoute({
 
 function IndexComponent() {
   return (
-    <Stack direction="column" spacing={2}>
+    <Stack direction="column" spacing={2} p={2}>
       <h3>Welcome to NeuraLib</h3>
       <Typography variant="body1">Create a library to get started!</Typography>
     </Stack>
@@ -140,7 +146,8 @@ function IndexComponent() {
 export const libraryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "$libraryId",
-  component: LibraryPage,
+  // component: LibraryPage,
+  component: LibraryContainer,
 });
 
 const routeTree = rootRoute.addChildren([indexRoute, libraryRoute]);
