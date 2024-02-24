@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+const LibrarySchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+});
+
+export type Library = z.infer<typeof LibrarySchema>;
+export type LibraryResponse = Library[];
+
 const MidiFileSchema = z.object({
   id: z.string(),
   name: z.string(),

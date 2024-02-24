@@ -2,8 +2,9 @@
 import { Divider, ListItem, Stack, Typography, useTheme } from "@mui/material";
 import { memo, useMemo } from "react";
 import { RegionParams } from "wavesurfer.js/dist/plugins/regions.esm.js";
-import { AudioFileResponse } from "../shared/types";
 import { AudioPlayer } from "./AudioPlayer";
+import { AudioFileResponse } from "../types/apiTypes";
+
 interface FileItemProps {
   file: AudioFileResponse;
 }

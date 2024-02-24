@@ -1,6 +1,6 @@
 import { List, Typography } from "@mui/material";
-import { AudioFileResponse, MidiFileResponse } from "../shared/types";
 import { FileItem } from "./AudioFileItem";
+import { AudioFileResponse, MidiFileResponse } from "../types/apiTypes";
 
 interface FileListProps {
   files: AudioFileResponse[];

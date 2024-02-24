@@ -6,8 +6,7 @@ import { Slice } from "@prisma/client";
 import cors from "cors";
 import express, { Express, Request, Response } from "express";
 import helmet from "helmet";
-import mime from "mime-types";
-import { v4 as uuid } from "uuid";
+import { registerApiRoutes } from "./api";
 import {
   audioToMidiQueue,
   audioToMidiQueueEvents,
@@ -27,13 +26,6 @@ import {
   tokenParamToHeader,
 } from "./middleware";
 import {
-  RawFile,
-  generateWaveFormJson,
-  getFileType,
-  parseMultipartReq,
-} from "./shared";
-import { removeFileExtension } from "./shared/stringUtils";
-import {
   CompletedQueueResult,
   ENV,
   EventType,
@@ -46,13 +38,12 @@ const startUp = async () => {
   app.use(cors());
   app.use(helmet());
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
   app.use(tokenParamToHeader);
   app.use(authenticate);
   app.use(createOrAddUser);
 
   await initMinioDefaultBucket();
-
-  // registerApiRoutes(app);
 
   separateQueueEvents.on("completed", (result) => {
     console.log("Job completed - id", result.jobId);
@@ -185,76 +176,6 @@ const startUp = async () => {
     const sseResponse = sseConnections.get(clientId);
     if (sseResponse) sendEvent(sseResponse, response);
     res.status(204).end();
-  });
-
-  app.post("/upload", async (req: Request, res: Response) => {
-    const user = req.user;
-    if (!user) return res.status(401).send("Unauthorized");
-    if (!req.body) res.status(400).json({ message: "No data to upload" });
-
-    const rawFile: RawFile = (await parseMultipartReq(req))[0];
-    const extension = mime.extension(rawFile.info.mimeType);
-    const objectKey = uuid();
-    const fileName = `${user.id}/${objectKey}.${extension}`;
-    const bucketName = ENV.MINIO_DEFAULT_BUCKET;
-
-    // Upload the file to minio
-    const response = await minioClient.putObject(
-      bucketName,
-      fileName,
-      rawFile.data,
-      undefined,
-      rawFile.info
-    );
-    if (response instanceof Error) {
-      return res.status(500).json({ message: "Error uploading file" });
-    }
-
-    const fileType = getFileType(rawFile.info.mimeType);
-    if (!fileType)
-      return res.status(400).json({ message: "Unsupported file type" });
-
-    const waveform = await generateWaveFormJson(rawFile, objectKey, fileType);
-
-    // Save the file to the database
-    const fileNameWithoutEnding = removeFileExtension(rawFile.info.filename);
-    const audio = await prisma.audioFile.create({
-      data: {
-        name: fileNameWithoutEnding,
-        filePath: fileName,
-        fileType: fileType,
-        user: {
-          connect: {
-            id: user.id,
-          },
-        },
-        waveform: waveform,
-      },
-    });
-    res.status(200).json({ id: audio.id });
-  });
-
-  app.get("/files", async (req: Request, res: Response) => {
-    const user = req.user;
-    if (!user) return res.status(401).send("Unauthorized");
-    const files = await prisma.audioFile.findMany({
-      where: {
-        userId: user.id,
-        parentId: null,
-      },
-      include: {
-        stems: {
-          include: {
-            midiFile: true,
-            transcription: true,
-            slices: true,
-          },
-        },
-        midiFile: true,
-        slices: true,
-      },
-    });
-    res.status(200).send(files);
   });
 
   app.get("/files/:id", async (req: Request, res: Response) => {
@@ -435,6 +356,8 @@ const startUp = async () => {
   app.get("/", async (req, res) => {
     res.status(200).json({ message: "Hello world" });
   });
+
+  registerApiRoutes(app);
 
   app.listen(ENV.PORT, () => {
     console.log(

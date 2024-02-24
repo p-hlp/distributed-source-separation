@@ -6,10 +6,11 @@ import { axiosInstance } from "../lib/axios";
 import { sanitize } from "../shared/stringUtils";
 
 interface Props {
-  onFileUpload?: () => void;
+  libraryId: string;
+  onFileUploadComplete?: () => void;
 }
 
-export const FileUploadForm = ({ onFileUpload }: Props) => {
+export const FileUploadForm = ({ libraryId, onFileUploadComplete }: Props) => {
   const [file, setFile] = useState<File | null>(null);
 
   const handleFileChange = (file: File | null) => {
@@ -21,9 +22,12 @@ export const FileUploadForm = ({ onFileUpload }: Props) => {
     const sanitizedFileName = sanitize(file.name);
     const formData = new FormData();
     formData.append("file", file, sanitizedFileName);
-    const response = await axiosInstance.post("/upload", formData);
+    const response = await axiosInstance.post(
+      `/api/libraries/${libraryId}/files`,
+      formData
+    );
     if (response) {
-      onFileUpload && onFileUpload();
+      onFileUploadComplete && onFileUploadComplete();
       setFile(null);
     }
   };
