@@ -27,7 +27,8 @@
     "react-dom": "18.2.0",
     "react-toastify": "10.0.4",
     "wavesurfer.js": "7.7.3",
-    "zod": "3.22.4"
+    "zod": "3.22.4",
+    "zustand": "4.5.1"
   },
   "devDependencies": {
     "@types/react": "18.2.56",

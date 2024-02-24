@@ -6,9 +6,11 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
+import { useNavigate } from "@tanstack/react-router";
 import React from "react";
 import { axiosInstance } from "../lib";
 import { queryClient } from "../main";
+import { useActiveLibraryStore } from "../store/activeLibraryStore";
 
 interface CreateLibraryModalProps {
   open: boolean;
@@ -19,6 +21,8 @@ export const CreateLibraryModal = ({
   open,
   handleClose,
 }: CreateLibraryModalProps) => {
+  const setLibrary = useActiveLibraryStore.use.setLibrary();
+  const navigate = useNavigate();
   return (
     <Dialog
       open={open}
@@ -36,12 +40,13 @@ export const CreateLibraryModal = ({
             description,
           });
           await queryClient.invalidateQueries({ queryKey: ["libraries"] });
-          console.log("res", res.data);
+          setLibrary(res.data.id);
+          navigate({ to: `/${res.data.id}` });
           handleClose();
         },
       }}
     >
-      <DialogTitle>Create a Library</DialogTitle>
+      <DialogTitle>Create Library</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus

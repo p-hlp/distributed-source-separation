@@ -29,13 +29,13 @@ export const MenuBar = () => {
             color: "inherit",
             textDecoration: "none",
             flexGrow: 1,
-            pl: 4,
+            pl: 2,
           }}
         >
           NeuraLib
         </Typography>
         {isAuthenticated && (
-          <Stack direction="row" spacing={2} alignItems="center" pr={2.5}>
+          <Stack direction="row" spacing={2} alignItems="center" pr={0.5}>
             <Typography
               sx={{
                 fontFamily: "monospace",
