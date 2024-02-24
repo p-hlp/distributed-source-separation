@@ -23,24 +23,21 @@ import {
   createRouter,
   useNavigate,
 } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CreateLibraryModal } from "./components/CreateLibraryModal";
 import { MenuBar } from "./components/MenuBar";
 import useAppBarHeight from "./hooks/useAppBarHeight";
 import { axiosInstance } from "./lib";
 import { LibraryContainer } from "./pages/LibraryContainer";
-import { Library, LibraryResponse } from "./types/apiTypes";
+import { useActiveLibraryStore } from "./store/activeLibraryStore";
+import { LibraryResponse } from "./types/apiTypes";
 
 const RootComponent = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const barHeight = useAppBarHeight();
-
-  // TODO - use activeLibrary to pass title to MenuBar
-  const [activeLibrary, setActiveLibrary] = useState<undefined | Library>(
-    undefined
-  );
+  const setLibrary = useActiveLibraryStore.use.setLibrary();
 
   const { data: libraries } = useQuery({
     queryKey: ["libraries"],
@@ -50,13 +47,6 @@ const RootComponent = () => {
     },
   });
 
-  useEffect(() => {
-    if (libraries && libraries.length > 0) {
-      setActiveLibrary(libraries[0]);
-      navigate({ to: `/${libraries[0].id}` });
-    }
-  }, [libraries, navigate]);
-
   const handleOpen = () => {
     setOpen(true);
   };
@@ -65,7 +55,10 @@ const RootComponent = () => {
     setOpen(false);
   };
 
-  console.log("libraries", libraries);
+  const handleLibraryClicked = (libraryId: string) => {
+    setLibrary(libraryId);
+    navigate({ to: `/${libraryId}` });
+  };
 
   if (!libraries) return null;
   return (
@@ -98,7 +91,7 @@ const RootComponent = () => {
           <List>
             {libraries.map((lib, index) => (
               <ListItem key={index} disablePadding>
-                <ListItemButton onClick={() => navigate({ to: `/${lib.id}` })}>
+                <ListItemButton onClick={() => handleLibraryClicked(lib.id)}>
                   <ListItemIcon>
                     <LibraryMusicOutlined />
                   </ListItemIcon>
@@ -126,6 +119,7 @@ const RootComponent = () => {
 
 const rootRoute = createRootRoute({
   component: RootComponent,
+  errorComponent: () => <div>Error</div>,
 });
 
 const indexRoute = createRoute({
@@ -143,11 +137,11 @@ function IndexComponent() {
   );
 }
 
-export const libraryRoute = createRoute({
+const libraryRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "$libraryId",
-  // component: LibraryPage,
   component: LibraryContainer,
+  errorComponent: () => <div>Error in LibraryRoute Components</div>,
 });
 
 const routeTree = rootRoute.addChildren([indexRoute, libraryRoute]);

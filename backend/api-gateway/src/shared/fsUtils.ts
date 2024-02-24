@@ -61,7 +61,7 @@ export const generateWaveFormJson = async (
   // Use audiowave to create the waveform
   const outJsoName = `${objectKey}.json`;
   const outPath = path.join(tmpDir, outJsoName);
-  const cmd = `audiowaveform -i ${tarPath} -o ${outPath} --pixels-per-second 20 --bits 8`;
+  const cmd = `audiowaveform -i ${tarPath} -o ${outPath} --pixels-per-second 50 --bits 8`;
   await execCommand(cmd);
 
   const jsonObject = await readJsonFile(outPath);
