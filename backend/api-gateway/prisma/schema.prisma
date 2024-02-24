@@ -15,6 +15,18 @@ model User {
   audioFiles     AudioFile[]
   midiFiles      MidiFile[]
   transcriptions Transcription[]
+  libraries      Library[]
+}
+
+model Library {
+  id        String      @id @default(uuid())
+  name      String
+  description String?
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  audioFiles AudioFile[] 
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 model AudioFile {
@@ -33,6 +45,8 @@ model AudioFile {
   midiFile      MidiFile?
   transcription Transcription?
   slices        Slice[]        
+  libraryId     String?
+  library       Library?       @relation(fields: [libraryId], references: [id], onDelete: Cascade)
 }
 
 model MidiFile {
@@ -71,3 +85,4 @@ model Slice {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
+

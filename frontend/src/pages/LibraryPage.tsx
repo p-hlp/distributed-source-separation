@@ -1,23 +1,43 @@
-// App.tsx
-
-import { Box, CircularProgress, Stack } from "@mui/material";
+import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
-import { FileList } from "./components/FileList";
-import { FileSelection } from "./components/FileSelection";
-import { FileUploadForm } from "./components/FileUploadForm";
-import { MenuBar } from "./components/MenuBar";
-import { useRegisterSSEListener } from "./hooks/useRegisterSSEListener";
-import { axiosInstance, rawAxiosInstance } from "./lib";
-import { queryClient } from "./main";
-import { AudioFileResponse, MidiFileResponse } from "./shared/types";
+import { libraryRoute } from "../AppRoutes";
+import { FileList } from "../components/FileList";
+import { FileSelection } from "../components/FileSelection";
+import { FileUploadForm } from "../components/FileUploadForm";
+import { useRegisterSSEListener } from "../hooks/useRegisterSSEListener";
+import { axiosInstance, rawAxiosInstance } from "../lib";
+import { queryClient } from "../main";
+import {
+  AudioFileResponse,
+  Library,
+  MidiFileResponse,
+} from "../types/apiTypes";
 
-const listFilesAPI = async (): Promise<AudioFileResponse[]> => {
-  const response = await axiosInstance.get<AudioFileResponse[]>("/files");
+const listFilesAPI = async (
+  libraryId: string
+): Promise<AudioFileResponse[]> => {
+  const response = await axiosInstance.get<AudioFileResponse[]>(
+    `/api/libraries/${libraryId}/files`
+  );
   return response.data;
 };
 
-export const App = () => {
+const libraryAPI = async (libraryId: string): Promise<Library> => {
+  const response = await axiosInstance.get<Library>(
+    `/api/libraries/${libraryId}`
+  );
+  return response.data;
+};
+
+export const LibraryPage = () => {
+  const { libraryId } = libraryRoute.useParams();
+
+  const { data: library } = useQuery({
+    queryKey: ["library", libraryId],
+    queryFn: () => libraryAPI(libraryId),
+  });
+
   const [selectedFile, setSelectedFile] = useState<AudioFileResponse | null>(
     null
   );
@@ -33,8 +53,8 @@ export const App = () => {
     isLoading,
     refetch,
   } = useQuery<AudioFileResponse[], Error>({
-    queryKey: ["files"],
-    queryFn: listFilesAPI,
+    queryKey: ["files", libraryId],
+    queryFn: () => listFilesAPI(libraryId),
     staleTime: 1000 * 60, // 1 minute
     gcTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -106,12 +126,19 @@ export const App = () => {
     },
   ]);
 
+  if (!library) return null;
+
   return (
     <Stack direction="column" sx={{ padding: 0 }}>
-      <MenuBar />
+      <Stack direction="row" spacing={2} alignItems="center" pb={2}>
+        <Typography variant="h5">{library.name}</Typography>
+        <Typography variant="body1">{`${library.id}`}</Typography>
+      </Stack>
+
       <Box p={1}>
         <FileUploadForm
-          onFileUpload={() =>
+          libraryId={libraryId}
+          onFileUploadComplete={() =>
             queryClient.invalidateQueries({ queryKey: ["files"] })
           }
         />

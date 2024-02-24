@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { AudioFileResponse } from "../shared/types"; // Adjust import path as needed
+import { AudioFileResponse } from "../types/apiTypes";
 
 interface FileSelectionProps {
   selectedFile: AudioFileResponse | null;

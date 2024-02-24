@@ -10,7 +10,10 @@ export const MenuBar = () => {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar
+      position="fixed"
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
       <Toolbar disableGutters>
         <Typography
           variant="h6"
