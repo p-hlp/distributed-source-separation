@@ -2,13 +2,13 @@ import { Box, Divider, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { getRouteApi } from "@tanstack/react-router";
 import { HeaderComponent } from "../components/HeaderComponent";
+import { DetailsContainer } from "../pages/DetailsContainer";
+import { FileContainer } from "../pages/FileContainer";
+import { PlayerContainer } from "../pages/PlayerContainer";
+import { libraryApi } from "../pages/api/libraryApi";
 import { useActiveFileStore } from "../store/activeFileStore";
-import { DetailsContainer } from "./DetailsContainer";
-import { FileContainer } from "./FileContainer";
-import { PlayerContainer } from "./PlayerContainer";
-import { libraryApi } from "./api/libraryApi";
 
-export const LibraryContainer = () => {
+export const LibraryComponent = () => {
   const routeApi = getRouteApi("/:libraryId");
   const { libraryId } = routeApi.useParams();
   const api = libraryApi();
@@ -59,4 +59,8 @@ const PlayerContainerWrapper = ({
   ) : (
     <Box p={2}>No file selected.</Box>
   );
+};
+
+export const LibraryErrorComponent = () => {
+  return <div>Error in LibraryRoute Components</div>;
 };
