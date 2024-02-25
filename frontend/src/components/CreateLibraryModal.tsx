@@ -9,7 +9,7 @@ import {
 import { useNavigate } from "@tanstack/react-router";
 import React from "react";
 import { axiosInstance } from "../lib";
-import { queryClient } from "../main";
+import { queryClient } from "../lib/queryClient";
 import { useActiveLibraryStore } from "../store/activeLibraryStore";
 
 interface CreateLibraryModalProps {

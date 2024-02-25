@@ -10,10 +10,10 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { FileUploadItem } from "../components/FileUploadForm";
-import { queryClient } from "../main";
 import { useActiveFileStore } from "../store/activeFileStore";
 import { AudioFileResponse } from "../types";
 import { filesApi } from "./api/filesApi";
+import { queryClient } from "../lib/queryClient";
 
 interface Props {
   libraryId: string;

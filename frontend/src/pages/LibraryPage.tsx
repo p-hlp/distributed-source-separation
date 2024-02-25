@@ -1,13 +1,13 @@
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { getRouteApi } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
-import { libraryRoute } from "../AppRoutes";
 import { FileList } from "../components/FileList";
 import { FileSelection } from "../components/FileSelection";
 import { FileUploadForm } from "../components/FileUploadForm";
 import { useRegisterSSEListener } from "../hooks/useRegisterSSEListener";
 import { axiosInstance, rawAxiosInstance } from "../lib";
-import { queryClient } from "../main";
+import { queryClient } from "../lib/queryClient";
 import {
   AudioFileResponse,
   Library,
@@ -31,7 +31,8 @@ const libraryAPI = async (libraryId: string): Promise<Library> => {
 };
 
 export const LibraryPage = () => {
-  const { libraryId } = libraryRoute.useParams();
+  const routeApi = getRouteApi("/:libraryId");
+  const { libraryId } = routeApi.useParams();
 
   const { data: library } = useQuery({
     queryKey: ["library", libraryId],

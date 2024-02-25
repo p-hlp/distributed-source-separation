@@ -10,9 +10,9 @@ import RegionsPlugin, {
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
 import { axiosInstance } from "../lib";
-import { queryClient } from "../main";
 import { AudioPlayerMenu } from "./AudioPlayerMenu";
 import { TextInputForm } from "./TextInputForm";
+import { queryClient } from "../lib/queryClient";
 
 interface AudioPlayerProps {
   audioFileId: string;
