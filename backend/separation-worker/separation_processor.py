@@ -69,8 +69,11 @@ class SeparationProcessor:
             raise RuntimeError("Failed to connect to Minio or Prisma")
 
         try:
+            print(f"Processing job: {job.id} with payload: {job.data}")
             id = str(job.data["audioFileId"])
             userId = str(job.data["userId"])
+            libraryId = str(job.data["libraryId"])
+
             audio_file = await self.prisma.audiofile.find_first(
                 where={"id": id, "userId": userId}
             )
@@ -121,7 +124,7 @@ class SeparationProcessor:
                 )
 
                 waveform_json = await generate_waveform_json(full_path)
-
+                isVocal = "vocal" in stem
                 # Save to database
                 response = await self.prisma.audiofile.create(
                     data={
@@ -129,8 +132,11 @@ class SeparationProcessor:
                         "filePath": full_path,
                         "userId": userId,
                         "parentId": id,
+                        "libraryId": libraryId,
                         "fileType": file_type,
                         "waveform": waveform_json,
+                        "isVocal": isVocal,
+                        "isSeparated": True,
                     }
                 )
 

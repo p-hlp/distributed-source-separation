@@ -1,12 +1,33 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { Logout } from "@mui/icons-material";
-import { AppBar, IconButton, Stack, Toolbar, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  IconButton,
+  Stack,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { useNavigate } from "@tanstack/react-router";
+import { useActiveFileStore } from "../store/activeFileStore";
+import { useActiveLibraryStore } from "../store/activeLibraryStore";
 
 export const MenuBar = () => {
   const { isAuthenticated, user, logout } = useAuth0();
+  const navigate = useNavigate();
+  const resetLibrary = useActiveLibraryStore.use.resetLibrary();
+  const resetFile = useActiveFileStore.use.resetFile();
+  const resetChildFile = useActiveFileStore.use.resetChildFile();
 
   const handleLogout = () => {
     logout({ logoutParams: { returnTo: window.location.origin } });
+  };
+
+  const navigateToHome = () => {
+    resetLibrary();
+    resetFile();
+    resetChildFile();
+    navigate({ to: "/" });
   };
 
   return (
@@ -19,7 +40,7 @@ export const MenuBar = () => {
           variant="h6"
           noWrap
           component="a"
-          href="#app-bar-with-responsive-menu"
+          onClick={navigateToHome}
           sx={{
             mr: 2,
             display: { xs: "none", md: "flex" },
@@ -28,12 +49,13 @@ export const MenuBar = () => {
             letterSpacing: ".3rem",
             color: "inherit",
             textDecoration: "none",
-            flexGrow: 1,
             pl: 2,
+            cursor: "pointer",
           }}
         >
           NeuraLib
         </Typography>
+        <Box flexGrow={1} />
         {isAuthenticated && (
           <Stack direction="row" spacing={2} alignItems="center" pr={0.5}>
             <Typography

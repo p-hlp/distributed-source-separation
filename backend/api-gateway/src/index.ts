@@ -86,7 +86,7 @@ const startUp = async () => {
       jobId: result.jobId,
       audioFileId: completedResult.audioFileId,
       status: completedResult.status,
-      type: EventType.audioToMidi,
+      type: EventType.midi,
     };
     const sseResponse = sseConnections.get(clientId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -102,7 +102,7 @@ const startUp = async () => {
       audioFileId: failedResult.audioFileId,
       status: failedResult.status,
       error: failedResult.error,
-      type: EventType.audioToMidi,
+      type: EventType.midi,
     };
     const sseResponse = sseConnections.get(failedResult.userId);
     if (sseResponse) sendEvent(sseResponse, response);
@@ -213,6 +213,33 @@ const startUp = async () => {
     res.status(200).send(file);
   });
 
+  app.get("/files/:id/transcription", async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) return res.status(401).send("Unauthorized");
+    const id = req.params.id;
+
+    const transcription = await prisma.transcription.findFirst({
+      where: {
+        audioFileId: id,
+      },
+    });
+    res.status(200).send(transcription);
+  });
+
+  app.get("/files/:id/midi", async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) return res.status(401).send("Unauthorized");
+    const id = req.params.id;
+
+    const midiFile = await prisma.midiFile.findFirst({
+      where: {
+        audioFileId: id,
+      },
+    });
+
+    res.status(200).send(midiFile);
+  });
+
   app.post("/slices", async (req: Request, res: Response) => {
     const user = req.user;
     if (!user) return res.status(401).send("Unauthorized");
@@ -320,7 +347,8 @@ const startUp = async () => {
   app.post("/separate", async (req: Request, res: Response) => {
     const jobPayload = {
       userId: req.user?.id,
-      audioFileId: req.body.data,
+      audioFileId: req.body.audioFileId,
+      libraryId: req.body.libraryId,
     };
     console.log("separate jobPayload", jobPayload);
     const job = await separateQueue.add("processData", jobPayload);
@@ -329,10 +357,10 @@ const startUp = async () => {
       .json({ message: "Data added to separate-queue", jobId: job.id });
   });
 
-  app.post("/audio-to-midi", async (req: Request, res: Response) => {
+  app.post("/midi", async (req: Request, res: Response) => {
     const jobPayload = {
       userId: req.user?.id,
-      audioFileId: req.body.data,
+      audioFileId: req.body.audioFileId,
     };
     console.log("audio-to-midi jobPayload", jobPayload);
     const job = await audioToMidiQueue.add("processData", jobPayload);
@@ -344,7 +372,7 @@ const startUp = async () => {
   app.post("/transcribe", async (req: Request, res: Response) => {
     const jobPayload = {
       userId: req.user?.id,
-      audioFileId: req.body.data,
+      audioFileId: req.body.audioFileId,
     };
     console.log("transcribe jobPayload", jobPayload);
     const job = await transcribeQueue.add("processData", jobPayload);
