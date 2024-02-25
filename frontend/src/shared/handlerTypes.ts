@@ -1,4 +1,4 @@
-export type EventType = "separate" | "message" | "transcribe" | "audioToMidi";
+export type EventType = "separate" | "message" | "transcribe" | "midi";
 export type EventStatus = "done" | "inProgress" | "failed";
 
 export interface EventData {

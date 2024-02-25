@@ -2,7 +2,7 @@ import { QueueJobStatus } from "./queue";
 
 export enum EventType {
   separate = "separate",
-  audioToMidi = "audioToMidi",
+  midi = "midi",
   transcribe = "transcribe",
   message = "message",
 }
