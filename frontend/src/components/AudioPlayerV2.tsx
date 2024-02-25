@@ -1,10 +1,4 @@
-import {
-  Forward5Outlined,
-  PlayCircleOutlined,
-  Replay5Outlined,
-  StopCircleOutlined,
-} from "@mui/icons-material";
-import { Divider, IconButton, Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useWavesurfer } from "@wavesurfer/react";
 import { memo, useCallback, useEffect, useMemo, useRef } from "react";
@@ -15,8 +9,9 @@ import RegionsPlugin, {
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
 import { axiosInstance } from "../lib";
-import { SubHeaderComponent } from "./SubHeaderComponent";
 import { queryClient } from "../lib/queryClient";
+import { AudioControls } from "./AudioPlayer/AudioControls";
+import { SubHeaderComponent } from "./SubHeaderComponent";
 
 interface AudioPlayerProps {
   audioFileId: string;
@@ -107,6 +102,8 @@ const random = (min: number, max: number) => Math.random() * (max - min) + min;
 const randomColor = () =>
   `rgba(${random(0, 255)}, ${random(0, 255)}, ${random(0, 255)}, 0.5)`;
 
+const initVolume = 50;
+
 export const AudioPlayerV2 = memo(
   ({
     audioFileId,
@@ -137,7 +134,7 @@ export const AudioPlayerV2 = memo(
     useEffect(() => {
       if (!wavesurfer) return;
       console.log("Main useEffect running.");
-      wavesurfer.setVolume(0.2);
+      wavesurfer.setVolume(initVolume / 100.0);
 
       const unsubInteraction = wavesurfer.on("interaction", () => {
         console.log("interaction");
@@ -198,47 +195,27 @@ export const AudioPlayerV2 = memo(
       wavesurfer && wavesurfer.playPause();
     }, [wavesurfer]);
 
+    const onChangeVolume = useCallback(
+      (volume: number) => {
+        wavesurfer && wavesurfer.setVolume(volume / 100.0);
+      },
+      [wavesurfer]
+    );
+
     return (
       <Stack direction="column" width={"100%"} height={"100%"}>
         <SubHeaderComponent title="Some Random File Title" />
         <Divider />
         <div ref={containerRef} style={{ width: "100%", padding: "16px" }} />
         <Divider />
-        <AudioControls onPlayPause={onPlayPause} isPlaying={isPlaying} />
+        <AudioControls
+          initVolume={50}
+          onPlayPause={onPlayPause}
+          onVolumeChange={onChangeVolume}
+          isPlaying={isPlaying}
+        />
+        <Divider />
       </Stack>
     );
   }
 );
-
-interface AudioControlsProps {
-  isPlaying: boolean;
-  onPlayPause: () => void;
-  onAddRegion?: (content: string) => void;
-  onAddMarker?: (content: string) => void;
-  onSaveRegions?: () => void;
-  onRemoveAllRegions?: () => void;
-}
-
-const AudioControls = (props: AudioControlsProps) => {
-  return (
-    <Stack direction="row" width={"100%"} justifyContent="center">
-      <IconButton>
-        <Replay5Outlined />
-      </IconButton>
-      <IconButton onClick={props.onPlayPause}>
-        <PlayPauseIcon isPlaying={props.isPlaying} />
-      </IconButton>
-      <IconButton>
-        <Forward5Outlined />
-      </IconButton>
-    </Stack>
-  );
-};
-
-const PlayPauseIcon = ({ isPlaying }: { isPlaying: boolean }) => {
-  return isPlaying ? (
-    <StopCircleOutlined fontSize="large" />
-  ) : (
-    <PlayCircleOutlined fontSize="large" />
-  );
-};

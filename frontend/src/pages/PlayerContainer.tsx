@@ -1,31 +1,30 @@
 import { Box, CircularProgress, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { AudioPlayerV2 } from "../components/AudioPlayerV2";
-import { useActiveFileStore } from "../store/activeFileStore";
-import { useActiveLibraryStore } from "../store/activeLibraryStore";
-import { filesApi } from "./api/filesApi";
+import { useSelectedFileId } from "../hooks/useSelectedFileId";
+import { getAudioFile } from "./FileActions/api";
 
 export const PlayerContainer = () => {
-  const currentFileId = useActiveFileStore.use.fileId();
-  const currentChildFileId = useActiveFileStore.use.childFileId();
-  const currentLibraryId = useActiveLibraryStore.use.libraryId();
-  const api = filesApi(currentLibraryId ?? "");
-
-  const actualFileId = currentChildFileId || currentFileId;
+  const { selectedFileId } = useSelectedFileId();
 
   const {
     data: file,
     isPending,
     isFetching,
   } = useQuery({
-    queryKey: ["playFile", currentLibraryId, actualFileId],
-    queryFn: () => api.GET(actualFileId!),
-    enabled: Boolean(actualFileId) && Boolean(currentLibraryId),
+    queryKey: ["audioFile", selectedFileId],
+    queryFn: () => getAudioFile(selectedFileId!),
+    enabled: Boolean(selectedFileId),
   });
 
   if (!file && isPending && isFetching) {
     return (
-      <Box width={"100%"} height={"100%"}>
+      <Box
+        width={"100%"}
+        height={"100%"}
+        alignItems="center"
+        justifyContent="center"
+      >
         <CircularProgress />
       </Box>
     );
