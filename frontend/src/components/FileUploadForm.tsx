@@ -68,13 +68,15 @@ export const FileUploadForm = ({ libraryId, onFileUploadComplete }: Props) => {
 };
 
 interface FileUploadItemProps {
-  libraryId: string;
+  fileUploadRequest: (formData: FormData) => Promise<any>;
   onFileUploadComplete?: () => void;
+  disabled?: boolean;
 }
 
 export const FileUploadItem = ({
-  libraryId,
+  fileUploadRequest,
   onFileUploadComplete,
+  disabled,
 }: FileUploadItemProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -86,16 +88,12 @@ export const FileUploadItem = ({
     const sanitizedFileName = sanitize(file.name);
     const formData = new FormData();
     formData.append("file", file, sanitizedFileName);
-    const response = await axiosInstance.post(
-      `/api/libraries/${libraryId}/files`,
-      formData
-    );
+    const response = await fileUploadRequest(formData);
     if (response) {
       setIsUploading(false);
       onFileUploadComplete && onFileUploadComplete();
     }
   };
-  console.log("libraryId", libraryId);
 
   const handleClick = () => {
     fileInputRef.current?.click();
@@ -103,7 +101,11 @@ export const FileUploadItem = ({
 
   return (
     <div key={"uploadItem"}>
-      <ListItemButton divider onClick={handleClick} disabled={isUploading}>
+      <ListItemButton
+        divider
+        onClick={handleClick}
+        disabled={isUploading || disabled}
+      >
         <ListItemIcon>
           <UploadFile />
         </ListItemIcon>

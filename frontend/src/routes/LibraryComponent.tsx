@@ -6,13 +6,11 @@ import { DetailsContainer } from "../pages/DetailsContainer";
 import { FileContainer } from "../pages/FileContainer";
 import { PlayerContainer } from "../pages/PlayerContainer";
 import { libraryApi } from "../pages/api/libraryApi";
-import { useActiveFileStore } from "../store/activeFileStore";
 
 export const LibraryComponent = () => {
   const routeApi = getRouteApi("/:libraryId");
   const { libraryId } = routeApi.useParams();
   const api = libraryApi();
-  const fileId = useActiveFileStore.use.fileId();
 
   const { data: library } = useQuery({
     queryKey: ["library", libraryId],
@@ -30,7 +28,7 @@ export const LibraryComponent = () => {
       >
         <Divider />
         <Box sx={{ height: "35%" }}>
-          <PlayerContainerWrapper fileId={fileId} libraryId={library.id} />
+          <PlayerContainer />
         </Box>
         <Divider />
         <Stack direction="row" spacing={0} sx={{ height: "65%" }}>
@@ -42,22 +40,6 @@ export const LibraryComponent = () => {
         </Stack>
       </Stack>
     </Box>
-  );
-};
-
-interface PlayerContainerWrapperProps {
-  libraryId: string;
-  fileId: string | undefined;
-}
-
-const PlayerContainerWrapper = ({
-  fileId,
-  libraryId,
-}: PlayerContainerWrapperProps) => {
-  return fileId ? (
-    <PlayerContainer libraryId={libraryId} fileId={fileId} />
-  ) : (
-    <Box p={2}>No file selected.</Box>
   );
 };
 

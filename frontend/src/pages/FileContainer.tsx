@@ -8,12 +8,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { FileUploadItem } from "../components/FileUploadForm";
+import { queryClient } from "../lib/queryClient";
 import { useActiveFileStore } from "../store/activeFileStore";
+import { useActiveLibraryStore } from "../store/activeLibraryStore";
 import { AudioFileResponse } from "../types";
 import { filesApi } from "./api/filesApi";
-import { queryClient } from "../lib/queryClient";
 
 interface Props {
   libraryId: string;
@@ -26,7 +27,9 @@ export const FileContainer = ({ libraryId }: Props) => {
         <MainFileList libraryId={libraryId} />
       </Box>
       <Divider orientation="vertical" flexItem />
-      <Box sx={{ width: "50%" }}>Files 2 </Box>
+      <Box sx={{ width: "50%" }}>
+        <AssociatedFileList />
+      </Box>
     </Stack>
   );
 };
@@ -43,6 +46,7 @@ const MainFileList = ({ libraryId }: MainFileListProps) => {
   const api = filesApi(libraryId);
   const fileId = useActiveFileStore.use.fileId();
   const setFile = useActiveFileStore.use.setFile();
+  const resetChildFile = useActiveFileStore.use.resetChildFile();
 
   const { data } = useQuery({
     queryKey: ["mainFiles", libraryId],
@@ -56,6 +60,7 @@ const MainFileList = ({ libraryId }: MainFileListProps) => {
 
   const handleListItemClicked = (fileId: string) => {
     setFile(fileId);
+    resetChildFile();
   };
 
   const handleFileUploadComplete = async () => {
@@ -66,7 +71,7 @@ const MainFileList = ({ libraryId }: MainFileListProps) => {
 
   if (!mainFiles) return null;
   return (
-    <Stack direction="column">
+    <Stack direction="column" overflow="auto" maxHeight="100%">
       <Typography variant="subtitle1" fontWeight={600} flexGrow={1} p={1}>
         Files
       </Typography>
@@ -76,7 +81,7 @@ const MainFileList = ({ libraryId }: MainFileListProps) => {
           return file.id === "upload" ? (
             <FileUploadItem
               key={file.id}
-              libraryId={libraryId}
+              fileUploadRequest={api.POST}
               onFileUploadComplete={handleFileUploadComplete}
             />
           ) : (
@@ -85,6 +90,72 @@ const MainFileList = ({ libraryId }: MainFileListProps) => {
               divider
               selected={file.id === fileId}
               onClick={() => handleListItemClicked(file.id)}
+            >
+              <ListItemText
+                primary={<Typography variant="body2">{file.name}</Typography>}
+                disableTypography
+              />
+            </ListItemButton>
+          );
+        })}
+      </List>
+    </Stack>
+  );
+};
+
+const AssociatedFileList = () => {
+  const currentMainFileId = useActiveFileStore.use.fileId();
+  const currentChildFileId = useActiveFileStore.use.childFileId();
+  const setChildFile = useActiveFileStore.use.setChildFile();
+  const currentLibraryId = useActiveLibraryStore.use.libraryId();
+  const api = filesApi(currentLibraryId ?? "");
+
+  const { data } = useQuery({
+    queryKey: ["childFiles", currentMainFileId],
+    queryFn: () => api.GET_CHILDREN(currentMainFileId!),
+    enabled: Boolean(currentMainFileId) && Boolean(currentLibraryId),
+  });
+
+  const childFiles = useMemo(() => {
+    const dataToAdd = data ? data : [];
+    return [uploadItem, ...dataToAdd];
+  }, [data]);
+
+  const handleFileUploadComplete = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ["childFiles", currentMainFileId],
+    });
+  };
+
+  const fileUploadRequest = useCallback(
+    async (formData: FormData) => {
+      if (!currentMainFileId) throw new Error("No main file selected");
+      return api.POST_CHILD(currentMainFileId, formData);
+    },
+    [api, currentMainFileId]
+  );
+
+  return (
+    <Stack direction="column" overflow="auto" maxHeight="100%">
+      <Typography variant="subtitle1" fontWeight={600} flexGrow={1} p={1}>
+        Associated Files
+      </Typography>
+      <Divider />
+      <List disablePadding>
+        {childFiles.map((file) => {
+          return file.id === "upload" ? (
+            <FileUploadItem
+              key={file.id}
+              disabled={!currentMainFileId}
+              fileUploadRequest={(formData) => fileUploadRequest(formData)}
+              onFileUploadComplete={handleFileUploadComplete}
+            />
+          ) : (
+            <ListItemButton
+              key={file.id}
+              divider
+              selected={file.id === currentChildFileId}
+              onClick={() => setChildFile(file.id)}
             >
               <ListItemText
                 primary={<Typography variant="body2">{file.name}</Typography>}

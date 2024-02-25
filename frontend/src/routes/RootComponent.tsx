@@ -14,11 +14,12 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Outlet, useNavigate } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CreateLibraryModal } from "../components/CreateLibraryModal";
 import { MenuBar } from "../components/MenuBar";
 import useAppBarHeight from "../hooks/useAppBarHeight";
 import { axiosInstance } from "../lib";
+import { useActiveFileStore } from "../store/activeFileStore";
 import { useActiveLibraryStore } from "../store/activeLibraryStore";
 import { LibraryResponse } from "../types";
 
@@ -28,6 +29,8 @@ export const RootComponent = () => {
   const navigate = useNavigate();
   const barHeight = useAppBarHeight();
   const setLibrary = useActiveLibraryStore.use.setLibrary();
+  const resetFile = useActiveFileStore.use.resetFile();
+  const resetChildFile = useActiveFileStore.use.resetChildFile();
 
   const { data: libraries } = useQuery({
     queryKey: ["libraries"],
@@ -47,6 +50,8 @@ export const RootComponent = () => {
 
   const handleLibraryClicked = (libraryId: string) => {
     setLibrary(libraryId);
+    resetFile();
+    resetChildFile();
     navigate({ to: `/${libraryId}` });
   };
 
@@ -106,14 +111,4 @@ export const RootComponent = () => {
       </Box>
     </Box>
   );
-};
-
-export const RootErrorComponent = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate({ to: "/" });
-  }, [navigate]);
-
-  return null;
 };

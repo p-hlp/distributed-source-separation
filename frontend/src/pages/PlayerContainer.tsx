@@ -1,28 +1,35 @@
 import { Box, CircularProgress, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { AudioPlayerV2 } from "../components/AudioPlayerV2";
+import { useActiveFileStore } from "../store/activeFileStore";
+import { useActiveLibraryStore } from "../store/activeLibraryStore";
 import { filesApi } from "./api/filesApi";
 
-interface Props {
-  libraryId: string;
-  fileId: string;
-}
+export const PlayerContainer = () => {
+  const currentFileId = useActiveFileStore.use.fileId();
+  const currentChildFileId = useActiveFileStore.use.childFileId();
+  const currentLibraryId = useActiveLibraryStore.use.libraryId();
+  const api = filesApi(currentLibraryId ?? "");
 
-export const PlayerContainer = ({ libraryId, fileId }: Props) => {
-  const api = filesApi(libraryId);
-  console.log("fileId: ", fileId);
+  const actualFileId = currentChildFileId || currentFileId;
 
-  const { data: file } = useQuery({
-    queryKey: ["file", libraryId, fileId],
-    queryFn: () => api.GET(fileId),
+  const {
+    data: file,
+    isPending,
+    isFetching,
+  } = useQuery({
+    queryKey: ["playFile", currentLibraryId, actualFileId],
+    queryFn: () => api.GET(actualFileId!),
+    enabled: Boolean(actualFileId) && Boolean(currentLibraryId),
   });
 
-  if (!file)
+  if (!file && isPending && isFetching) {
     return (
       <Box width={"100%"} height={"100%"}>
         <CircularProgress />
       </Box>
     );
+  } else if (!file) return <Box p={2}>No file selected.</Box>;
 
   return (
     <Stack direction="column" sx={{ width: "100%", height: "100%" }}>

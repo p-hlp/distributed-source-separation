@@ -4,8 +4,11 @@ import { createSelectors } from "./utils";
 
 interface ActiveFileState {
   fileId: string | undefined;
+  childFileId: string | undefined;
   setFile: (id: string) => void;
   resetFile: () => void;
+  setChildFile: (id: string) => void;
+  resetChildFile: () => void;
 }
 
 const useActiveFileStoreBase = create<ActiveFileState>()(
@@ -13,8 +16,11 @@ const useActiveFileStoreBase = create<ActiveFileState>()(
     persist(
       (set) => ({
         fileId: undefined as string | undefined,
+        childFileId: undefined as string | undefined,
         setFile: (id) => set({ fileId: id }),
+        setChildFile: (id) => set({ childFileId: id }),
         resetFile: () => set({ fileId: undefined }),
+        resetChildFile: () => set({ childFileId: undefined }),
       }),
       { name: "file-storage" }
     )

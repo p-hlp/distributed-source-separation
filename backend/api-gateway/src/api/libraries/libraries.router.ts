@@ -213,3 +213,89 @@ librariesRouter.get(
     res.status(200).send(file);
   }
 );
+
+librariesRouter.get(
+  "/:id/files/:fileId/children",
+  async (req: Request, res: Response) => {
+    if (!req.user) return res.status(401).send("Unauthorized");
+    const user = req.user;
+    const id = req.params.id;
+    const fileId = req.params.fileId;
+
+    const files = await prisma.audioFile.findMany({
+      where: {
+        libraryId: id,
+        userId: user.id,
+        parentId: fileId,
+      },
+      include: {
+        midiFile: true,
+        transcription: true,
+        slices: true,
+      },
+    });
+    res.status(200).send(files);
+  }
+);
+
+librariesRouter.post(
+  "/:id/files/:fileId/children",
+  async (req: Request, res: Response) => {
+    if (!req.user) return res.status(401).send("Unauthorized");
+    if (!req.body) res.status(400).json({ message: "No data to upload" });
+    const user = req.user;
+    const libraryId = req.params.id;
+    const parentId = req.params.fileId;
+
+    const rawFile: RawFile = (await parseMultipartReq(req))[0];
+    const extension = mime.extension(rawFile.info.mimeType);
+    const objectKey = uuid();
+    const fileName = `${user.id}/${objectKey}.${extension}`;
+    const bucketName = ENV.MINIO_DEFAULT_BUCKET;
+
+    // Upload the file to minio
+    const response = await minioClient.putObject(
+      bucketName,
+      fileName,
+      rawFile.data,
+      undefined,
+      rawFile.info
+    );
+    if (response instanceof Error) {
+      return res.status(500).json({ message: "Error uploading file" });
+    }
+
+    const fileType = getFileType(rawFile.info.mimeType);
+    if (!fileType)
+      return res.status(400).json({ message: "Unsupported file type" });
+
+    const waveform = await generateWaveFormJson(rawFile, objectKey, fileType);
+
+    // Save the file to the database
+    const fileNameWithoutEnding = removeFileExtension(rawFile.info.filename);
+    const audio = await prisma.audioFile.create({
+      data: {
+        name: fileNameWithoutEnding,
+        filePath: fileName,
+        fileType: fileType,
+        user: {
+          connect: {
+            id: user.id,
+          },
+        },
+        parent: {
+          connect: {
+            id: parentId,
+          },
+        },
+        library: {
+          connect: {
+            id: libraryId,
+          },
+        },
+        waveform: waveform,
+      },
+    });
+    res.status(200).json({ id: audio.id });
+  }
+);
