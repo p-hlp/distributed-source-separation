@@ -39,7 +39,7 @@
     "@types/node": "20.11.25",
     "@types/uuid": "9.0.8",
     "concurrently": "8.2.2",
-    "nodemon": "3.0.3",
+    "nodemon": "3.1.0",
     "prisma": "5.10.2",
     "typescript": "5.3.3"
   }
