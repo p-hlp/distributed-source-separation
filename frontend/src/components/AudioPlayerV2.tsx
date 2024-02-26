@@ -11,7 +11,6 @@ import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
 import { axiosInstance } from "../lib";
 import { queryClient } from "../lib/queryClient";
 import { AudioControls } from "./AudioPlayer/AudioControls";
-import { SubHeaderComponent } from "./SubHeaderComponent";
 
 interface AudioPlayerProps {
   audioFileId: string;
@@ -204,8 +203,6 @@ export const AudioPlayerV2 = memo(
 
     return (
       <Stack direction="column" width={"100%"} height={"100%"}>
-        <SubHeaderComponent title="Some Random File Title" />
-        <Divider />
         <div ref={containerRef} style={{ width: "100%", padding: "16px" }} />
         <Divider />
         <AudioControls

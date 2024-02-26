@@ -35,6 +35,7 @@ model AudioFile {
   filePath      String
   userId        String
   fileType      String
+  duration      Float? 
   parentId      String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt

@@ -98,7 +98,8 @@ class SeparationProcessor:
 
             audio_buffer = io.BytesIO(file_data)
             waveform, sample_rate = torchaudio.load(audio_buffer)
-            print(f"Sample rate: {sample_rate}")
+            total_samples = waveform.shape[1]
+            duration = total_samples / sample_rate
             print("Separating stems...")
             _, separated_stems = self.separator.separate_tensor(waveform)
             print(f"Stems count: {len(separated_stems)}")

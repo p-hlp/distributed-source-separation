@@ -63,6 +63,8 @@ const StemSchema = z.object({
   slices: z.array(RegionSchema),
   isVocal: z.boolean(),
   isSeparated: z.boolean(),
+  preSignedUrl: z.string(),
+  duration: z.number(),
 });
 
 const AudioFileSchema = StemSchema.extend({

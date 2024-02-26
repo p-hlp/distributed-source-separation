@@ -3,11 +3,14 @@ import { FastForwardIcon, FastRewindIcon, PlayPauseIcon } from "../Icons";
 import { AddMarkerIcon } from "../Icons/AddMarkerIcon";
 import { AddRegionIcon } from "../Icons/AddRegionIcon";
 import { VolumeControl } from "./VolumeControl";
+import { ZoomControl } from "./ZoomControl";
 
 interface AudioControlsProps {
   isPlaying: boolean;
   initVolume: number;
+  initZoom: number;
   onPlayPause: () => void;
+  onZoom?: (value: number) => void;
   onAddRegion?: () => void;
   onAddMarker?: () => void;
   onVolumeChange?: (volume: number) => void;
@@ -17,8 +20,15 @@ interface AudioControlsProps {
 
 export const AudioControls = (props: AudioControlsProps) => {
   return (
-    <Stack direction="row" width={"100%"} pl={3} pr={4}>
-      <Stack direction="row" width={180}>
+    <Stack
+      direction="row"
+      width={"100%"}
+      height={64}
+      px={4}
+      alignItems="center"
+    >
+      <Stack direction="row" width={360}>
+        <ZoomControl initZoom={props.initZoom} onZoomChange={props.onZoom} />
         <IconButton onClick={props.onAddMarker}>
           <AddMarkerIcon />
         </IconButton>
@@ -37,12 +47,11 @@ export const AudioControls = (props: AudioControlsProps) => {
         <FastForwardIcon />
       </IconButton>
       <Box flexGrow={1} />
-      {props.onVolumeChange && (
-        <VolumeControl
-          initVolume={props.initVolume}
-          onVolumeChange={props.onVolumeChange}
-        />
-      )}
+      <Box width={180} />
+      <VolumeControl
+        initVolume={props.initVolume}
+        onVolumeChange={props?.onVolumeChange}
+      />
     </Stack>
   );
 };

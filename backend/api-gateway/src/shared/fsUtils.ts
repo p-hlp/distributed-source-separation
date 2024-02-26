@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 import fs from "fs/promises";
+import getAudioDurationInSeconds from "get-audio-duration";
 import os from "os";
 import path from "path";
 import { promisify } from "util";
@@ -47,11 +48,11 @@ export const readJsonFile = async (filePath: string) => {
   }
 };
 
-export const generateWaveFormJson = async (
+export const generateWaveFormJsonAndDuration = async (
   rawFile: RawFile,
   objectKey: string,
   fileType: string
-): Promise<any> => {
+): Promise<{ waveform: string; durationInSeconds: number }> => {
   const tmpDir = os.tmpdir();
   const outAudioName = `${objectKey}.${fileType}`;
   const tarPath = path.join(tmpDir, outAudioName);
@@ -61,12 +62,15 @@ export const generateWaveFormJson = async (
   // Use audiowave to create the waveform
   const outJsoName = `${objectKey}.json`;
   const outPath = path.join(tmpDir, outJsoName);
-  const cmd = `audiowaveform -i ${tarPath} -o ${outPath} --pixels-per-second 50 --bits 8`;
+  const cmd = `audiowaveform -i ${tarPath} -o ${outPath} --pixels-per-second 100 --bits 8`;
   await execCommand(cmd);
 
-  const jsonObject = await readJsonFile(outPath);
+  const waveform = await readJsonFile(outPath);
+
+  // Get the duration of the file with ffprobe
+  const durationInSeconds = await getAudioDurationInSeconds(tarPath);
 
   await removeTempFiles([outAudioName, outJsoName]);
 
-  return jsonObject;
+  return { waveform, durationInSeconds };
 };

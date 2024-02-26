@@ -29,7 +29,6 @@ export const SeparationAction = () => {
   const disabled =
     !selectedFileId || !libraryId || !file || file.isSeparated || inProgress;
 
-  console.log("File", file);
   const handleClick = async () => {
     if (!file || file.id != selectedFileId) {
       console.error("File not found");
@@ -39,6 +38,7 @@ export const SeparationAction = () => {
     setInProgress(true);
     const response = await axiosInstance.post("/separate", {
       audioFileId: selectedFileId,
+      libraryId: libraryId,
     });
     console.log(response);
   };

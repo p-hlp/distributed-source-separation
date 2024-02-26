@@ -4,8 +4,8 @@ import { getRouteApi } from "@tanstack/react-router";
 import { HeaderComponent } from "../components/HeaderComponent";
 import { DetailsContainer } from "../pages/DetailsContainer";
 import { FileContainer } from "../pages/FileContainer";
-import { PlayerContainer } from "../pages/PlayerContainer";
 import { libraryApi } from "../pages/api/libraryApi";
+import { AudioPlayerContainer } from "../pages/PlayerContainer";
 
 export const LibraryComponent = () => {
   const routeApi = getRouteApi("/:libraryId");
@@ -27,11 +27,9 @@ export const LibraryComponent = () => {
         sx={{ width: "100%", height: "100%" }}
       >
         <Divider />
-        <Box sx={{ height: "35%" }}>
-          <PlayerContainer />
-        </Box>
+        <AudioPlayerContainer />
         <Divider />
-        <Stack direction="row" spacing={0} sx={{ height: "65%" }}>
+        <Stack direction="row" spacing={0} flexGrow={1}>
           <Stack direction="row" sx={{ width: "100%", height: "100%" }}>
             <FileContainer libraryId={library.id} />
             <Divider orientation="vertical" flexItem />

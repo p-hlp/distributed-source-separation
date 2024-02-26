@@ -1,44 +1,38 @@
-import { Box, CircularProgress, Stack } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { AudioPlayerV2 } from "../components/AudioPlayerV2";
+import { memo } from "react";
+import { WaveAudioPlayer } from "../components/AudioPlayer/WaveAudioPlayer";
+import { SubHeaderComponent } from "../components/SubHeaderComponent";
 import { useSelectedFileId } from "../hooks/useSelectedFileId";
 import { getAudioFile } from "./FileActions/api";
 
-export const PlayerContainer = () => {
+export const waveFormContainerHeight = 180;
+const containerHeight = 64 + 64 + waveFormContainerHeight;
+
+const NoFilePlaceholder = () => {
+  return (
+    <Stack direction="column" width={"100%"} height={containerHeight} p={2}>
+      No file selected.
+    </Stack>
+  );
+};
+
+export const AudioPlayerContainer = memo(() => {
   const { selectedFileId } = useSelectedFileId();
 
-  const {
-    data: file,
-    isPending,
-    isFetching,
-  } = useQuery({
+  const { data: file } = useQuery({
     queryKey: ["audioFile", selectedFileId],
     queryFn: () => getAudioFile(selectedFileId!),
     enabled: Boolean(selectedFileId),
   });
 
-  if (!file && isPending && isFetching) {
-    return (
-      <Box
-        width={"100%"}
-        height={"100%"}
-        alignItems="center"
-        justifyContent="center"
-      >
-        <CircularProgress />
-      </Box>
-    );
-  } else if (!file) return <Box p={2}>No file selected.</Box>;
-
+  if (!file) return <NoFilePlaceholder />;
+  console.log("preSignedUrl", file.preSignedUrl);
   return (
-    <Stack direction="column" sx={{ width: "100%", height: "100%" }}>
-      <AudioPlayerV2
-        audioFileId={file.id}
-        filePath={file.filePath}
-        peaks={[file.waveform.data]}
-        duration={file.waveform.length / file.waveform.sample_rate}
-        existingRegions={[]}
-      />
+    <Stack direction="column" height={containerHeight} width={"100%"}>
+      <SubHeaderComponent title={file.name} />
+      <Divider />
+      <WaveAudioPlayer file={file} />
     </Stack>
   );
-};
+});

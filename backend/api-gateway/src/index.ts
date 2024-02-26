@@ -182,7 +182,7 @@ const startUp = async () => {
     const user = req.user;
     if (!user) return res.status(401).send("Unauthorized");
     const id = req.params.id;
-    const file = await prisma.audioFile.findUnique({
+    const audioFile = await prisma.audioFile.findUnique({
       where: {
         id: id,
       },
@@ -198,6 +198,9 @@ const startUp = async () => {
         slices: true,
       },
     });
+    if (!audioFile) return res.status(404).send("Audio file not found");
+    const url = await preSignUrl(audioFile.filePath);
+    const file = { ...audioFile, preSignedUrl: url };
     res.status(200).send(file);
   });
 
@@ -309,6 +312,24 @@ const startUp = async () => {
       }
     }
   );
+
+  const preSignUrl = async (
+    filePath: string,
+    expiry = 60 * 60 * 24
+  ): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      minioClient.presignedUrl(
+        "GET",
+        ENV.MINIO_DEFAULT_BUCKET,
+        filePath,
+        expiry,
+        (err, url) => {
+          if (err) reject(err);
+          resolve(url);
+        }
+      );
+    });
+  };
 
   /**
    * This endpoint returns a signed url for the object

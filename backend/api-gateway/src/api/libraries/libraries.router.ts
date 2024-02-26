@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid";
 import { minioClient, prisma } from "../../lib";
 import {
   RawFile,
-  generateWaveFormJson,
+  generateWaveFormJsonAndDuration,
   getFileType,
   parseMultipartReq,
 } from "../../shared";
@@ -128,7 +128,11 @@ librariesRouter.post("/:id/files", async (req: Request, res: Response) => {
   if (!fileType)
     return res.status(400).json({ message: "Unsupported file type" });
 
-  const waveform = await generateWaveFormJson(rawFile, objectKey, fileType);
+  const { waveform, durationInSeconds } = await generateWaveFormJsonAndDuration(
+    rawFile,
+    objectKey,
+    fileType
+  );
 
   // Save the file to the database
   const fileNameWithoutEnding = removeFileExtension(rawFile.info.filename);
@@ -137,6 +141,7 @@ librariesRouter.post("/:id/files", async (req: Request, res: Response) => {
       name: fileNameWithoutEnding,
       filePath: fileName,
       fileType: fileType,
+      duration: durationInSeconds,
       user: {
         connect: {
           id: user.id,
@@ -269,7 +274,8 @@ librariesRouter.post(
     if (!fileType)
       return res.status(400).json({ message: "Unsupported file type" });
 
-    const waveform = await generateWaveFormJson(rawFile, objectKey, fileType);
+    const { waveform, durationInSeconds } =
+      await generateWaveFormJsonAndDuration(rawFile, objectKey, fileType);
 
     // Save the file to the database
     const fileNameWithoutEnding = removeFileExtension(rawFile.info.filename);
@@ -278,6 +284,7 @@ librariesRouter.post(
         name: fileNameWithoutEnding,
         filePath: fileName,
         fileType: fileType,
+        duration: durationInSeconds,
         user: {
           connect: {
             id: user.id,
