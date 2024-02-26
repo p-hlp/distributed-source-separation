@@ -780,6 +780,16 @@
     tiny-invariant "^1.3.1"
     tiny-warning "^1.0.3"
 
+"@tanstack/react-router@1.17.4":
+  version "1.17.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-router/-/react-router-1.17.4.tgz#15d1745bae2c77ee60549824c174e4eaf8af93be"
+  integrity sha512-iW/TgJN/qZ+Ly73jDU3D2AuC3IlAHGx3ybXTvVuZ1hihsud7arEg7g83hsuU+xbkPcVWfly9ndTb1XKxrovw9w==
+  dependencies:
+    "@tanstack/history" "1.15.13"
+    "@tanstack/react-store" "^0.2.1"
+    tiny-invariant "^1.3.1"
+    tiny-warning "^1.0.3"
+
 "@tanstack/react-store@^0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@tanstack/react-store/-/react-store-0.2.1.tgz#c1a04c85d403d842e56c6d0709211f013bdd1021"
@@ -788,12 +798,12 @@
     "@tanstack/store" "0.1.3"
     use-sync-external-store "^1.2.0"
 
-"@tanstack/router-devtools@^1.17.1":
-  version "1.17.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/router-devtools/-/router-devtools-1.17.1.tgz#d8b0220cd55552c73cf194da978f986a37162751"
-  integrity sha512-QlsYtOaDK8Y0sGIV+HPhAwU24yOhxMM8n/MD7swl8exOjRWQV9NjSnni3q5pvvCacRiwV9DkZaWPSNNDgrZj+g==
+"@tanstack/router-devtools@^1.17.4":
+  version "1.17.4"
+  resolved "https://registry.yarnpkg.com/@tanstack/router-devtools/-/router-devtools-1.17.4.tgz#0f9f91f39cf797145508046ee9fef9b282ca3010"
+  integrity sha512-tt02Xi1WpM/WkSrgmiKDvFa9OsLApWSfxulHVzyl/F9JMulOjqy45s0BxH2PlQSKGHjp8CNIBRyd4Ajs+sIN3A==
   dependencies:
-    "@tanstack/react-router" "1.16.6"
+    "@tanstack/react-router" "1.17.4"
     clsx "^2.1.0"
     date-fns "^2.29.1"
     goober "^2.1.14"
