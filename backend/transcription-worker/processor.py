@@ -117,6 +117,15 @@ class Processor:
 
             os.remove("temp.wav")
 
+            current_transcription = await self.prisma.transcription.find_first(
+                where={"audioFileId": audioFileId}
+            )
+            if current_transcription:
+                print("Transcription already exists, removing...")
+                await self.prisma.transcription.delete(
+                    where={"audioFileId": audioFileId}
+                )
+
             # Save the transcription to the database
             print(f"Saving transcription to the database...")
             await self.prisma.transcription.create(

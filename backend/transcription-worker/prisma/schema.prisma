@@ -32,7 +32,7 @@ model AudioFile {
   libraryId     String?
   isVocal       Boolean        @default(false)
   isSeparated   Boolean        @default(false)
-  duration      Float?
+  duration      Float
   Library       Library?       @relation(fields: [libraryId], references: [id], onDelete: Cascade)
   parent        AudioFile?     @relation("ParentAudioFile", fields: [parentId], references: [id], onDelete: Cascade)
   stems         AudioFile[]    @relation("ParentAudioFile")

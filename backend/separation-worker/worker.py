@@ -7,7 +7,7 @@ from utils import check_device
 async def main():
     check_device()
 
-    processor = SeparationProcessor(model="htdemucs")
+    processor = SeparationProcessor(model="htdemucs_ft")
 
     worker_manager = WorkerManager(processor, queue_name="separate")
     await worker_manager.start_worker()

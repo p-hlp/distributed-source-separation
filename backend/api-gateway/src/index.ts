@@ -32,6 +32,7 @@ import {
   FailedQueueResult,
   QueueJobStatus,
 } from "./types";
+import { FileInfoResponse } from "./types/api";
 
 const startUp = async () => {
   const app: Express = express();
@@ -242,6 +243,41 @@ const startUp = async () => {
     });
 
     res.status(200).send(midiFile);
+  });
+
+  app.get("/files/:id/info", async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) return res.status(401).send("Unauthorized");
+    const id = req.params.id;
+
+    const audioFile = await prisma.audioFile.findUnique({
+      where: {
+        id: id,
+      },
+      include: {
+        stems: true,
+        midiFile: true,
+        slices: true,
+        transcription: true,
+        library: true,
+        parent: true,
+      },
+    });
+    if (!audioFile) return res.status(404).send("Audio file not found");
+
+    const response: FileInfoResponse = {
+      name: audioFile.name,
+      fileType: audioFile.fileType,
+      durationInSeconds: audioFile.duration,
+      libraryName: audioFile.library?.name || "Unknown",
+      parentName: audioFile.parent?.name || "Unknown",
+      slices: audioFile.slices.length,
+      hasMidi: Boolean(audioFile.midiFile),
+      hasTranscription: Boolean(audioFile.transcription),
+      createdAt: audioFile.createdAt.toISOString(),
+      updatedAt: audioFile.updatedAt.toISOString(),
+    };
+    res.status(200).json(response);
   });
 
   app.post("/slices", async (req: Request, res: Response) => {

@@ -71,6 +71,19 @@ const AudioFileSchema = StemSchema.extend({
   stems: z.array(StemSchema).optional(),
 });
 
+const FileInfoSchema = z.object({
+  name: z.string(),
+  fileType: z.string(),
+  durationInSeconds: z.number(),
+  libraryName: z.string(),
+  parentName: z.string().nullable(),
+  slices: z.number(),
+  hasMidi: z.boolean(),
+  hasTranscription: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
 export type RegionResponse = z.infer<typeof RegionSchema>;
 
 export type WaveformData = z.infer<typeof WavefromDataSchema>;
@@ -82,3 +95,5 @@ export type MidiFileResponse = z.infer<typeof MidiFileSchema>;
 export type StemResponse = z.infer<typeof StemSchema>;
 
 export type AudioFileResponse = z.infer<typeof AudioFileSchema>;
+
+export type FileInfoResponse = z.infer<typeof FileInfoSchema>;

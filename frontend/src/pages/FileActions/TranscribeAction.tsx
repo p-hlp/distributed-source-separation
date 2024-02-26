@@ -26,15 +26,9 @@ export const TransrcibeAction = () => {
     enabled: Boolean(selectedFileId),
   });
 
-  const transcribed = Boolean(file?.transcription);
   const isVocal = Boolean(file?.isVocal);
   const disabled =
-    !selectedFileId ||
-    !libraryId ||
-    !file ||
-    transcribed ||
-    !isVocal ||
-    inProgress;
+    !selectedFileId || !libraryId || !file || !isVocal || inProgress;
 
   const handleClick = async () => {
     if (!file || file.id != selectedFileId) {
@@ -53,6 +47,8 @@ export const TransrcibeAction = () => {
     setInProgress(false);
     if (!file) return;
     queryClient.invalidateQueries({ queryKey: ["transcription", file.id] });
+    queryClient.invalidateQueries({ queryKey: ["audioFile", file.id] });
+    queryClient.invalidateQueries({ queryKey: ["fileInfo", file.id] });
   }, [file]);
 
   useRegisterSSEListener([

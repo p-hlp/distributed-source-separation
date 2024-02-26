@@ -138,6 +138,7 @@ class SeparationProcessor:
                         "waveform": waveform_json,
                         "isVocal": isVocal,
                         "isSeparated": True,
+                        "duration": duration,
                     }
                 )
 
