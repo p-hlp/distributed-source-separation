@@ -11,6 +11,8 @@ Follow the [setup](https://github.com/openai/whisper?tab=readme-ov-file#setup) o
 Install needed dependencies manually:
 
 ```shell
+conda env create --name transcription python=3.10
+conda activate transcription
 conda install pytorch torchvision torchaudio pytorch-cuda=12.1 -c pytorch -c nvidia
 pip install -r requirements.txt
 ```

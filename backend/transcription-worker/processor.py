@@ -38,11 +38,11 @@ class Processor:
         await self.prisma.disconnect()
 
     def initialize_minio_client(self):
-        self.minio_access_key = os.getenv("MINIO_ACCESS_KEY")
-        self.minio_secret_key = os.getenv("MINIO_SECRET_KEY")
-        self.minio_endpoint = os.getenv("MINIO_ENDPOINT")
+        self.minio_access_key = os.getenv("MINIO_ACCESS_KEY", "")
+        self.minio_secret_key = os.getenv("MINIO_SECRET_KEY", "")
+        self.minio_endpoint = os.getenv("MINIO_ENDPOINT", "")
         self.minio_port = int(os.getenv("MINIO_PORT", 9000))
-        self.minio_default_bucket = os.getenv("MINIO_DEFAULT_BUCKET")
+        self.minio_default_bucket = os.getenv("MINIO_DEFAULT_BUCKET", "audio")
 
         self.minio_client = Minio(
             f"{self.minio_endpoint}:{self.minio_port}",
@@ -62,6 +62,8 @@ class Processor:
         try:
             audioFileId = job.data["audioFileId"]
             userId = job.data["userId"]
+
+            print(f"Processing audio file: {audioFileId} for user: {userId}")
 
             audio_file = await self.prisma.audiofile.find_first(
                 where={"id": audioFileId, "userId": userId}

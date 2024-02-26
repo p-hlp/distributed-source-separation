@@ -3,11 +3,11 @@ import asyncio
 
 
 async def main():
-    modle_name = "medium.en"
+    modle_name = "small.en"
     print(f"Loading model {modle_name}...")
 
     model = whisper.load_model(modle_name)
-    audio = whisper.load_audio("vocals.wav")
+    audio = whisper.load_audio("test.wav")
     print(f"Audio shape: {audio.shape}")
 
     # Check if model_name ends with .en

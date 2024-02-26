@@ -196,6 +196,7 @@ const startUp = async () => {
         },
         midiFile: true,
         slices: true,
+        transcription: true,
       },
     });
     if (!audioFile) return res.status(404).send("Audio file not found");
