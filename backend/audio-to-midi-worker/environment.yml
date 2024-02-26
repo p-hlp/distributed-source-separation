@@ -7,11 +7,11 @@ dependencies:
   - pip
   - pip:
       - tensorflow[and-cuda]
-      - git+https://github.com/p-hlp/basic-pitch@master
-      - librosa==0.10.1
-      - minio==7.2.3
-      - prisma==0.12.0
-      - dotenv==0.0.5
-      - pretty_midi==0.2.10
-      - bullmq==2.2.2
-      - uuid==1.30
+      # - git+https://github.com/p-hlp/basic-pitch@master
+      # - librosa==0.10.1
+      # - minio==7.2.3
+      # - prisma==0.12.0
+      # - dotenv==0.0.5
+      # - pretty_midi==0.2.10
+      # - bullmq==2.2.2
+      # - uuid==1.30

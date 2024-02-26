@@ -37,7 +37,6 @@ export const DownloadMidiAction = () => {
     console.log("Downloading midi for file", selectedFileId);
     // Get midi file for selectedFileId
     const midiFile = await getMidiFile(selectedFileId!);
-    console.log("Midi file", midiFile);
     if (!midiFile) return;
     await downloadFileMinio(midiFile.filePath, midiFile.name);
     setInProgress(false);

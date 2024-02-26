@@ -9,52 +9,83 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  auth0Id   String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  audioFiles AudioFile[]
-  midiFiles MidiFile[]
+  id             String          @id @default(uuid())
+  auth0Id        String          @unique
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  audioFiles     AudioFile[]
+  Library        Library[]
+  midiFiles      MidiFile[]
   transcriptions Transcription[]
 }
 
 model AudioFile {
-  id            String       @id @default(uuid())
+  id            String         @id @default(uuid())
   name          String
-  filePath      String       // Path in MinIO object storage
-  userId        String       // Relation to User model
-  user          User         @relation(fields: [userId], references: [id])
-  fileType      String       // File type (e.g. wav, mp3, etc.)
-  parentId      String?      // Relation to parent AudioFile (if this is a stem)
-  parent        AudioFile?   @relation("ParentAudioFile", fields: [parentId], references: [id])
-  stems         AudioFile[]  @relation("ParentAudioFile")
+  filePath      String
+  userId        String
+  fileType      String
+  parentId      String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  waveform      Json?
+  libraryId     String?
+  isVocal       Boolean        @default(false)
+  isSeparated   Boolean        @default(false)
+  duration      Float?
+  Library       Library?       @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  parent        AudioFile?     @relation("ParentAudioFile", fields: [parentId], references: [id], onDelete: Cascade)
+  stems         AudioFile[]    @relation("ParentAudioFile")
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   midiFile      MidiFile?
+  Slice         Slice[]
   transcription Transcription?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
 }
 
 model MidiFile {
-  id          String     @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
-  userId      String     // Relation to User model
-  user        User       @relation(fields: [userId], references: [id])
-  filePath    String     // Path in MinIO object storage
-  fileType    String     @default("mid") 
-  audioFileId String     @unique
-  audioFile   AudioFile  @relation(fields: [audioFileId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  userId      String
+  filePath    String
+  fileType    String    @default("mid")
+  audioFileId String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  audioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Transcription {
-  id          String     @id @default(uuid())
-  text        String     // Transcribed text
-  userId      String     // Relation to User model
-  user        User       @relation(fields: [userId], references: [id])
-  audioFileId String     @unique
-  audioFile   AudioFile  @relation(fields: [audioFileId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id          String    @id @default(uuid())
+  text        String
+  userId      String
+  audioFileId String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  audioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model Library {
+  id          String      @id
+  name        String
+  description String?
+  userId      String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime
+  AudioFile   AudioFile[]
+  User        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Slice {
+  id          String    @id
+  sliceId     String    @unique
+  name        String
+  start       Float
+  end         Float?
+  color       String
+  audioFileId String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  AudioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
+}

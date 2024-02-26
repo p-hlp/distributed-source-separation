@@ -23,7 +23,7 @@ def init_minio_client() -> Minio:
     minio_secret_key = os.getenv("MINIO_SECRET_KEY")
     minio_endpoint = os.getenv("MINIO_ENDPOINT")
     minio_port = int(os.getenv("MINIO_PORT", 9000))
-    minio_default_bucket = os.getenv("MINIO_DEFAULT_BUCKET")
+    minio_default_bucket = os.getenv("MINIO_DEFAULT_BUCKET", "audio")
 
     minio_client = Minio(
         f"{minio_endpoint}:{minio_port}",
@@ -66,7 +66,9 @@ async def main():
     # Download audio file from Minio, open stream with soundfile dont save to disk
     file_path = audio_file.filePath
     print(f"Downloading file from Minio: {file_path}")
-    response = minio_client.get_object(os.getenv("MINIO_DEFAULT_BUCKET"), file_path)
+    response = minio_client.get_object(
+        os.getenv("MINIO_DEFAULT_BUCKET", "audio"), file_path
+    )
     try:
         file_data = response.read()
     finally:
