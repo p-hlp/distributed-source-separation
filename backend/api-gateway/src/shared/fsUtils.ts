@@ -32,7 +32,6 @@ export const removeTempFiles = async (fileNames: string | string[]) => {
     const filePath = path.join(tempDir, fileName); // Construct the full path to the file
     try {
       await fs.unlink(filePath);
-      console.log(`Successfully removed file: ${filePath}`);
     } catch (error) {
       console.error(`Error removing file: ${error}`);
     }
@@ -57,9 +56,7 @@ export const generateWaveFormJsonAndDuration = async (
   const outAudioName = `${objectKey}.${fileType}`;
   const tarPath = path.join(tmpDir, outAudioName);
   await fs.writeFile(tarPath, rawFile.data);
-  console.log("Wrote file to disk at", tarPath);
 
-  // Use audiowave to create the waveform
   const outJsoName = `${objectKey}.json`;
   const outPath = path.join(tmpDir, outJsoName);
   const cmd = `audiowaveform -i ${tarPath} -o ${outPath} --pixels-per-second 100 --bits 8`;
@@ -67,7 +64,6 @@ export const generateWaveFormJsonAndDuration = async (
 
   const waveform = await readJsonFile(outPath);
 
-  // Get the duration of the file with ffprobe
   const durationInSeconds = await getAudioDurationInSeconds(tarPath);
 
   await removeTempFiles([outAudioName, outJsoName]);

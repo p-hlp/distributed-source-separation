@@ -8,12 +8,12 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { FileUploadItem } from "../../components/FileUploadForm";
 import { SectionBar } from "../../components/SectionBar";
 import { queryClient } from "../../lib/queryClient";
 import { useActiveFileStore } from "../../store/activeFileStore";
 import { filesApi } from "../api/filesApi";
 import { uploadItem } from "./utils";
+import { FileUploadItem } from "./FileUploadItem";
 
 interface MainFileListProps {
   libraryId: string;

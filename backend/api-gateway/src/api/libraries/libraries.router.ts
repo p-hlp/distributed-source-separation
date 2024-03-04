@@ -10,6 +10,7 @@ import {
 } from "../../shared";
 import { removeFileExtension } from "../../shared/stringUtils";
 import { ENV } from "../../types";
+import { saveFile } from "./fileUpload";
 
 export const librariesRouter = express.Router();
 
@@ -106,64 +107,19 @@ librariesRouter.post("/:id/files", async (req: Request, res: Response) => {
   const user = req.user;
   const libraryId = req.params.id;
 
-  const rawFile: RawFile = (await parseMultipartReq(req))[0];
-  const extension = mime.extension(rawFile.info.mimeType);
-  const objectKey = uuid();
-  const fileName = `${user.id}/${objectKey}.${extension}`;
-  const bucketName = ENV.MINIO_DEFAULT_BUCKET;
-
-  // Upload the file to minio
-  const response = await minioClient.putObject(
-    bucketName,
-    fileName,
-    rawFile.data,
-    undefined,
-    rawFile.info
-  );
-  if (response instanceof Error) {
-    return res.status(500).json({ message: "Error uploading file" });
+  const rawFiles: RawFile[] = await parseMultipartReq(req);
+  const audioIds = [];
+  for (const rawFile of rawFiles) {
+    const audioId = await saveFile(rawFile, user, libraryId);
+    audioIds.push(audioId);
   }
-
-  const fileType = getFileType(rawFile.info.mimeType);
-  if (!fileType)
-    return res.status(400).json({ message: "Unsupported file type" });
-
-  const { waveform, durationInSeconds } = await generateWaveFormJsonAndDuration(
-    rawFile,
-    objectKey,
-    fileType
-  );
-
-  // Save the file to the database
-  const fileNameWithoutEnding = removeFileExtension(rawFile.info.filename);
-  const audio = await prisma.audioFile.create({
-    data: {
-      name: fileNameWithoutEnding,
-      filePath: fileName,
-      fileType: fileType,
-      duration: durationInSeconds,
-      user: {
-        connect: {
-          id: user.id,
-        },
-      },
-      library: {
-        connect: {
-          id: libraryId,
-        },
-      },
-      waveform: waveform,
-    },
-  });
-  res.status(200).json({ id: audio.id });
+  res.status(200).json(audioIds);
 });
 
 librariesRouter.get("/:id/files", async (req: Request, res: Response) => {
   if (!req.user) return res.status(401).send("Unauthorized");
   const user = req.user;
   const id = req.params.id;
-
-  console.log("Fetching files for library", id, "for user", user.id);
 
   const files = await prisma.audioFile.findMany({
     where: {
@@ -184,7 +140,9 @@ librariesRouter.get("/:id/files", async (req: Request, res: Response) => {
       },
     },
   });
-  res.status(200).send(files);
+
+  const sortedFiles = files.sort((a, b) => a.name.localeCompare(b.name));
+  res.status(200).send(sortedFiles);
 });
 
 librariesRouter.get(
