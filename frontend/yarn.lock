@@ -780,6 +780,16 @@
     tiny-invariant "^1.3.1"
     tiny-warning "^1.0.3"
 
+"@tanstack/react-router@1.18.3":
+  version "1.18.3"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-router/-/react-router-1.18.3.tgz#f6f095ae79ec467bdf483d2e72aeffaa7315212e"
+  integrity sha512-SaP3myClq8VLrIy+ZCQb+azRa55quWeKVCyjbRZUfNWS0mzRRWkCeNfWBb8M9dYimTLeGHck8GthZDuQBiBkbw==
+  dependencies:
+    "@tanstack/history" "1.15.13"
+    "@tanstack/react-store" "^0.2.1"
+    tiny-invariant "^1.3.1"
+    tiny-warning "^1.0.3"
+
 "@tanstack/react-store@^0.2.1":
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/@tanstack/react-store/-/react-store-0.2.1.tgz#c1a04c85d403d842e56c6d0709211f013bdd1021"
