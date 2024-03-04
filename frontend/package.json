@@ -19,7 +19,7 @@
     "@tanstack/react-query": "5.24.1",
     "@tanstack/react-query-devtools": "5.24.1",
     "@tanstack/react-router": "1.16.6",
-    "@tanstack/router-devtools": "^1.17.1",
+    "@tanstack/router-devtools": "^1.18.3",
     "@tanstack/router-vite-plugin": "1.16.5",
     "@types/humanize-duration": "3.27.4",
     "@wavesurfer/react": "1.0.4",
