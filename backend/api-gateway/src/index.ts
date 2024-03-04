@@ -280,6 +280,26 @@ const startUp = async () => {
     res.status(200).json(response);
   });
 
+  app.post("/files/:id/slices", async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) return res.status(401).send("Unauthorized");
+    const id = req.params.id;
+    const slices = req.body.slices;
+    const sliceRecords = slices.map((slice: any) => {
+      return {
+        sliceId: slice.id,
+        name: slice.name,
+        start: slice.start,
+        end: slice.end,
+        audioFileId: id,
+        color: slice.color,
+      };
+    });
+
+    const response = await prisma.slice.createMany({ data: sliceRecords });
+    res.status(200).send(response);
+  });
+
   app.post("/slices", async (req: Request, res: Response) => {
     const user = req.user;
     if (!user) return res.status(401).send("Unauthorized");

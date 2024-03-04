@@ -1,4 +1,5 @@
-import { Box, IconButton, Stack } from "@mui/material";
+import { Repeat, RepeatOn } from "@mui/icons-material";
+import { Box, Checkbox, IconButton, Stack } from "@mui/material";
 import { FastForwardIcon, FastRewindIcon, PlayPauseIcon } from "../Icons";
 import { AddMarkerIcon } from "../Icons/AddMarkerIcon";
 import { AddRegionIcon } from "../Icons/AddRegionIcon";
@@ -47,11 +48,30 @@ export const AudioControls = (props: AudioControlsProps) => {
         <FastForwardIcon />
       </IconButton>
       <Box flexGrow={1} />
-      <Box width={180} />
+      <Box
+        width={180}
+        display="flex"
+        justifyContent="flex-end"
+        alignItems="center"
+        pr={1}
+      >
+        <LoopCheckBox />
+      </Box>
       <VolumeControl
         initVolume={props.initVolume}
         onVolumeChange={props?.onVolumeChange}
       />
     </Stack>
+  );
+};
+
+interface LoopCheckBoxProps {
+  isLooping: boolean;
+  onLoopChange: (isLooping: boolean) => void;
+}
+
+const LoopCheckBox = () => {
+  return (
+    <Checkbox color="default" icon={<Repeat />} checkedIcon={<RepeatOn />} />
   );
 };

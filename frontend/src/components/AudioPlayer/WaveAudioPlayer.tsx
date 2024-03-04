@@ -6,6 +6,7 @@ import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
 import { waveFormContainerHeight } from "../../pages/PlayerContainer";
 import { AudioFileResponse } from "../../types";
 import { AudioControls } from "./AudioControls";
+import { addMarker, addRegion } from "./regionUtils";
 
 const initVolume = 50;
 
@@ -33,8 +34,20 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
     plugins: allPlugins,
     interact: true, // when interact is false, regions have correct start point on click
     normalize: true,
-    width: 1640,
+    // width: 1640,
   });
+
+  const regions = useMemo(() => {
+    return file.slices.map((slice) => {
+      return {
+        id: slice.id,
+        content: slice.name,
+        start: slice.start,
+        end: slice.end ?? undefined,
+        color: slice.color,
+      };
+    });
+  }, [file.slices]);
 
   // Main events
   useEffect(() => {
@@ -76,8 +89,6 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
     wavesurfer.skip(-5);
   }, [wavesurfer]);
 
-  console.log("container width", containerRef.current?.clientWidth);
-
   return (
     <Stack direction="column" width={"100%"} height={"100%"}>
       <div
@@ -89,6 +100,7 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
       />
       <Divider />
       <AudioControls
+        isPlaying={isPlaying}
         initVolume={50}
         initZoom={0}
         on5Forward={on5Forward}
@@ -96,7 +108,8 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
         onPlayPause={onPlayPause}
         onZoom={onZoomChange}
         onVolumeChange={onChangeVolume}
-        isPlaying={isPlaying}
+        onAddMarker={() => addMarker("testMarker", wavesurfer, regionsPlugin)}
+        onAddRegion={() => addRegion("testRegion", wavesurfer, regionsPlugin)}
       />
     </Stack>
   );

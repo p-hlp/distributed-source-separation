@@ -14,6 +14,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Outlet, useNavigate } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import { useDocumentTitle } from "@uidotdev/usehooks";
 import { useState } from "react";
 import { CreateLibraryModal } from "../components/CreateLibraryModal";
 import { MenuBar } from "../components/MenuBar";
@@ -31,6 +32,8 @@ export const RootComponent = () => {
   const setLibrary = useActiveLibraryStore.use.setLibrary();
   const resetFile = useActiveFileStore.use.resetFile();
   const resetChildFile = useActiveFileStore.use.resetChildFile();
+
+  useDocumentTitle("NeuraLib");
 
   const { data: libraries } = useQuery({
     queryKey: ["libraries"],

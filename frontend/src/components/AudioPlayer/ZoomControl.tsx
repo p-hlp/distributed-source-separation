@@ -22,7 +22,7 @@ export const ZoomControl = ({ initZoom, onZoomChange }: ZoomControlProps) => {
   return (
     <Stack spacing={2} pr={2} direction="row" alignItems="center" width={180}>
       <TinyText color={mainIconColor}>Zoom</TinyText>
-      <ImpSlider value={value} onChange={handleChange} min={0} max={150} />
+      <ImpSlider value={value} onChange={handleChange} min={0} max={200} />
     </Stack>
   );
 };
