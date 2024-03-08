@@ -30,7 +30,11 @@ export const AudioPlayerContainer = memo(() => {
   console.log("preSignedUrl", file.preSignedUrl);
   return (
     <Stack direction="column" height={containerHeight} width={"100%"}>
-      <SubHeaderComponent title={file.name} />
+      <SubHeaderComponent
+        title={file.name}
+        fileId={file.id}
+        isChildFile={!file.stems}
+      />
       <Divider />
       <WaveAudioPlayer file={file} />
     </Stack>

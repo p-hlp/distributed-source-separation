@@ -1,6 +1,15 @@
-import { Delete } from "@mui/icons-material";
-import { IconButton, Toolbar, Typography } from "@mui/material";
+import { CloudDownload, Delete, MoreVert } from "@mui/icons-material";
+import {
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { queryClient } from "../lib/queryClient";
 import { libraryApi } from "../sections/api/libraryApi";
 import { useActiveFileStore } from "../store/activeFileStore";
@@ -22,14 +31,31 @@ export const HeaderComponent = ({
   const resetFile = useActiveFileStore.use.resetFile();
   const resetLibrary = useActiveLibraryStore.use.resetLibrary();
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const navigate = useNavigate();
 
   const handleDeleteLibrary = async () => {
     await api.DELETE(id);
+    handleClose();
     resetFile();
     resetLibrary();
     await queryClient.invalidateQueries({ queryKey: ["libraries"] });
     navigate({ to: "/" });
+  };
+
+  const handleExportLibrary = async () => {
+    console.log("Export Library", id);
+    handleClose();
   };
 
   return (
@@ -39,12 +65,37 @@ export const HeaderComponent = ({
       </Typography>
       <IconButton
         edge="end"
-        aria-label="delete"
-        onClick={handleDeleteLibrary}
+        aria-label="more"
         size="large"
+        onClick={handleClick}
+        aria-haspopup="true"
+        aria-expanded={open ? "true" : undefined}
+        aria-controls={open ? "library-menu" : undefined}
       >
-        <Delete />
+        <MoreVert />
       </IconButton>
+      <Menu
+        id="library-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          "aria-labelledby": "library-button",
+        }}
+      >
+        <MenuItem onClick={handleExportLibrary}>
+          <ListItemIcon>
+            <CloudDownload fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Export Library</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={handleDeleteLibrary}>
+          <ListItemIcon>
+            <Delete fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Delete Library</ListItemText>
+        </MenuItem>
+      </Menu>
     </Toolbar>
   );
 };

@@ -11,10 +11,15 @@ import { AddRegionIcon } from "../Icons/AddRegionIcon";
 import { VolumeControl } from "./VolumeControl";
 import { ZoomControl } from "./ZoomControl";
 
+interface ZoomConfig {
+  initZoom: number;
+  zoomRange?: { min?: number; max?: number };
+}
+
 interface AudioControlsProps {
   isPlaying: boolean;
   initVolume: number;
-  initZoom: number;
+  zoomConfig: ZoomConfig;
   onPlayPause: () => void;
   onZoom?: (value: number) => void;
   onAddRegion?: () => void;
@@ -27,6 +32,7 @@ interface AudioControlsProps {
 }
 
 export const AudioControls = (props: AudioControlsProps) => {
+  const { initZoom, zoomRange } = props.zoomConfig;
   return (
     <Stack
       direction="row"
@@ -36,7 +42,11 @@ export const AudioControls = (props: AudioControlsProps) => {
       alignItems="center"
     >
       <Stack direction="row" width={360}>
-        <ZoomControl initZoom={props.initZoom} onZoomChange={props.onZoom} />
+        <ZoomControl
+          initZoom={initZoom}
+          zoomRange={zoomRange}
+          onZoomChange={props.onZoom}
+        />
         <IconButton onClick={props.onAddMarker}>
           <AddMarkerIcon />
         </IconButton>

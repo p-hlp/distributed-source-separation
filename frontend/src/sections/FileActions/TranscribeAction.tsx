@@ -64,7 +64,7 @@ export const TransrcibeAction = () => {
       <ListItemButton disabled={disabled} onClick={handleClick}>
         <ListItemText
           primary="Transcribe (Vocals Only)"
-          secondary="Transcribes selected vocal file to text using OpenAI Whisper"
+          secondary="Transcribes selected vocal file using OpenAI Whisper"
         />
       </ListItemButton>
       {inProgress && <LinearProgress color="inherit" variant="indeterminate" />}

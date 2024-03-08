@@ -61,7 +61,6 @@ export const CreateLibraryModal = ({
           variant="standard"
         />
         <TextField
-          autoFocus
           margin="dense"
           id="name"
           name="description"
