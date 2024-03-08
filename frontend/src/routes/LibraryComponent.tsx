@@ -2,10 +2,10 @@ import { Box, Divider, Stack } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { getRouteApi } from "@tanstack/react-router";
 import { HeaderComponent } from "../components/HeaderComponent";
-import { DetailsContainer } from "../pages/DetailsContainer";
-import { FileContainer } from "../pages/FileContainer";
-import { AudioPlayerContainer } from "../pages/PlayerContainer";
-import { libraryApi } from "../pages/api/libraryApi";
+import { DetailsContainer } from "../sections/DetailsContainer";
+import { FileContainer } from "../sections/FileContainer";
+import { AudioPlayerContainer } from "../sections/PlayerContainer";
+import { libraryApi } from "../sections/api/libraryApi";
 
 export const LibraryComponent = () => {
   const routeApi = getRouteApi("/:libraryId");

@@ -3,7 +3,7 @@ import { useWavesurfer } from "@wavesurfer/react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
-import { waveFormContainerHeight } from "../../pages/PlayerContainer";
+import { waveFormContainerHeight } from "../../sections/PlayerContainer";
 import { AudioFileResponse } from "../../types";
 import { AddRegionDialog, RegionType } from "./AddRegionDialog";
 import { AudioControls } from "./AudioControls";

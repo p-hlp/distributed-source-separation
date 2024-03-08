@@ -2,10 +2,10 @@ import { Delete } from "@mui/icons-material";
 import { IconButton, Toolbar, Typography } from "@mui/material";
 import { useNavigate } from "@tanstack/react-router";
 import { queryClient } from "../lib/queryClient";
-import { libraryApi } from "../pages/api/libraryApi";
+import { libraryApi } from "../sections/api/libraryApi";
+import { useActiveFileStore } from "../store/activeFileStore";
 import { useActiveLibraryStore } from "../store/activeLibraryStore";
 import { Library } from "../types";
-import { useActiveFileStore } from "../store/activeFileStore";
 
 const formatTitle = (name: string, description?: string) => {
   return description ? `${name} - ${description}` : name;
