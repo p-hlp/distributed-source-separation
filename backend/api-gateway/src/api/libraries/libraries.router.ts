@@ -1,15 +1,6 @@
 import express, { Request, Response } from "express";
-import mime from "mime-types";
-import { v4 as uuid } from "uuid";
-import { minioClient, prisma } from "../../lib";
-import {
-  RawFile,
-  generateWaveFormJsonAndDuration,
-  getFileType,
-  parseMultipartReq,
-} from "../../shared";
-import { removeFileExtension } from "../../shared/stringUtils";
-import { ENV } from "../../types";
+import { prisma } from "../../lib";
+import { RawFile, parseMultipartReq } from "../../shared";
 import { saveFile } from "./fileUpload";
 
 export const librariesRouter = express.Router();
@@ -203,59 +194,14 @@ librariesRouter.post(
     if (!req.body) res.status(400).json({ message: "No data to upload" });
     const user = req.user;
     const libraryId = req.params.id;
-    const parentId = req.params.fileId;
+    const fileId = req.params.fileId;
 
-    const rawFile: RawFile = (await parseMultipartReq(req))[0];
-    const extension = mime.extension(rawFile.info.mimeType);
-    const objectKey = uuid();
-    const fileName = `${user.id}/${objectKey}.${extension}`;
-    const bucketName = ENV.MINIO_DEFAULT_BUCKET;
-
-    // Upload the file to minio
-    const response = await minioClient.putObject(
-      bucketName,
-      fileName,
-      rawFile.data,
-      undefined,
-      rawFile.info
-    );
-    if (response instanceof Error) {
-      return res.status(500).json({ message: "Error uploading file" });
+    const rawFiles: RawFile[] = await parseMultipartReq(req);
+    const audioIds = [];
+    for (const rawFile of rawFiles) {
+      const audioId = await saveFile(rawFile, user, libraryId, fileId);
+      audioIds.push(audioId);
     }
-
-    const fileType = getFileType(rawFile.info.mimeType);
-    if (!fileType)
-      return res.status(400).json({ message: "Unsupported file type" });
-
-    const { waveform, durationInSeconds } =
-      await generateWaveFormJsonAndDuration(rawFile, objectKey, fileType);
-
-    // Save the file to the database
-    const fileNameWithoutEnding = removeFileExtension(rawFile.info.filename);
-    const audio = await prisma.audioFile.create({
-      data: {
-        name: fileNameWithoutEnding,
-        filePath: fileName,
-        fileType: fileType,
-        duration: durationInSeconds,
-        user: {
-          connect: {
-            id: user.id,
-          },
-        },
-        parent: {
-          connect: {
-            id: parentId,
-          },
-        },
-        library: {
-          connect: {
-            id: libraryId,
-          },
-        },
-        waveform: waveform,
-      },
-    });
-    res.status(200).json({ id: audio.id });
+    res.status(200).json(audioIds);
   }
 );

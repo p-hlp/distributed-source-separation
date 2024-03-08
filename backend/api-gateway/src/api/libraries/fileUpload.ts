@@ -13,7 +13,8 @@ import { ENV } from "../../types";
 export const saveFile = async (
   file: RawFile,
   user: User,
-  libraryId: string
+  libraryId: string,
+  parentId?: string
 ): Promise<string> => {
   const extension = mime.extension(file.info.mimeType);
   const objectKey = uuid();
@@ -52,6 +53,7 @@ export const saveFile = async (
       filePath: fileName,
       fileType: fileType,
       duration: durationInSeconds,
+      parent: parentId ? { connect: { id: parentId } } : undefined,
       user: {
         connect: {
           id: user.id,

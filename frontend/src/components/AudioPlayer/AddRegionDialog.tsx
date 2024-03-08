@@ -45,18 +45,26 @@ export const AddRegionDialog = ({
 
   const title = regionType === "marker" ? "Add Marker" : "Add Region";
 
-  const handleCloseDialog = () => {
-    // clear the form
+  const resetDialog = () => {
     setRegionName("");
     setRegionLength(undefined);
+  };
+
+  const onClose = () => {
+    resetDialog();
     handleClose();
+  };
+
+  const onAdd = () => {
+    resetDialog();
+    onAddRegion(regionType, regionName, regionLength);
   };
 
   if (!regionType) return null;
   return (
     <Dialog
       open={open}
-      onClose={handleCloseDialog}
+      onClose={onClose}
       PaperProps={{ sx: { minWidth: "20%" } }}
     >
       <DialogTitle>{title}</DialogTitle>
@@ -87,13 +95,10 @@ export const AddRegionDialog = ({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} variant="outlined">
+        <Button onClick={onClose} variant="outlined">
           Cancel
         </Button>
-        <Button
-          onClick={() => onAddRegion(regionType, regionName, regionLength)}
-          variant="contained"
-        >
+        <Button onClick={onAdd} variant="contained">
           Add
         </Button>
       </DialogActions>

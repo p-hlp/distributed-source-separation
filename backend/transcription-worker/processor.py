@@ -97,10 +97,11 @@ class Processor:
             audio_data = soundfile_to_librosa(data)
 
             audio_mono = librosa.to_mono(audio_data)
+            temp_path = "temp.wav"
 
             # TODO - Directly use the audio buffer instead of saving to a file
             sf.write(
-                "temp.wav",
+                temp_path,
                 librosa_to_soundfile(audio_mono),
                 samplerate=sample_rate,
             )
@@ -112,8 +113,8 @@ class Processor:
             # Transcsribe the audio buffer
             print(f"Transcribing audio...", "data type of audio_mono", audio_mono.dtype)
             # TODO - Use the audio buffer directly instead of saving to a file
-            whsiper_audio = whisper.load_audio("temp.wav")
-            result = self.model.transcribe(whsiper_audio)
+            whisper_audio = whisper.load_audio(temp_path)
+            result = self.model.transcribe(audio=whisper_audio)
 
             os.remove("temp.wav")
 
