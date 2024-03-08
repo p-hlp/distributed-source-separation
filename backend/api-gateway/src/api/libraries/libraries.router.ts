@@ -1,7 +1,12 @@
 import express, { Request, Response } from "express";
-import { prisma } from "../../lib";
-import { RawFile, parseMultipartReq } from "../../shared";
+import fs from "fs/promises";
+import os from "os";
+import path from "path";
+import { minioClient, prisma } from "../../lib";
+import { RawFile, parseMultipartReq, removeDir } from "../../shared";
+import { ENV } from "../../types";
 import { saveFile } from "./fileUpload";
+import { segmentAndSaveLocal } from "./utils";
 
 export const librariesRouter = express.Router();
 
@@ -203,5 +208,69 @@ librariesRouter.post(
       audioIds.push(audioId);
     }
     res.status(200).json(audioIds);
+  }
+);
+
+interface PostRegionsData {
+  parentId: string;
+  regions: Region[];
+}
+
+interface Region {
+  name: string;
+  start: number;
+  end: number;
+}
+
+librariesRouter.post(
+  "/:id/files/:fileId/regions",
+  async (req: Request, res: Response) => {
+    if (!req.user) return res.status(401).send("Unauthorized");
+    const user = req.user;
+    const fileId = req.params.fileId;
+    const { parentId, regions } = req.body as PostRegionsData;
+    const libraryId = req.params.id;
+
+    // Get file from database and minio
+    const audioFile = await prisma.audioFile.findUnique({
+      where: { id: fileId },
+      select: { id: true, filePath: true, fileType: true },
+    });
+
+    if (!audioFile) res.status(404).send("File not found");
+
+    console.log("Fetched audio file from database: ", audioFile?.id);
+    const filePath = audioFile?.filePath as string;
+    const fileType = audioFile?.fileType as string;
+
+    console.log("Fetched audio file from minio: ", filePath);
+
+    // TODO only for debugging
+    await removeDir(path.join(os.tmpdir(), user.id));
+    await fs.mkdir(path.join(os.tmpdir(), user.id));
+
+    const savedIds: string[] = [];
+    for (const region of regions) {
+      // INFO if stream is only gotten once, the second iteration will not work
+      const stream = await minioClient.getObject(
+        ENV.MINIO_DEFAULT_BUCKET,
+        filePath
+      );
+      console.log("Processing region: ", region.name);
+      const savedRegionId = await segmentAndSaveLocal(
+        stream,
+        user.id,
+        libraryId,
+        parentId,
+        region.name,
+        fileType,
+        region.start,
+        region.end - region.start
+      );
+      savedIds.push(savedRegionId);
+    }
+
+    await removeDir(path.join(os.tmpdir(), user.id));
+    res.status(200).json(savedIds);
   }
 );

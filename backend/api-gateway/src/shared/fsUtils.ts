@@ -4,6 +4,7 @@ import getAudioDurationInSeconds from "get-audio-duration";
 import os from "os";
 import path from "path";
 import { promisify } from "util";
+import { v4 as uuid } from "uuid";
 import { RawFile } from "./httpUtils";
 
 const execAsync = promisify(exec);
@@ -67,6 +68,50 @@ export const generateWaveFormJsonAndDuration = async (
   const durationInSeconds = await getAudioDurationInSeconds(tarPath);
 
   await removeTempFiles([outAudioName, outJsoName]);
+
+  return { waveform, durationInSeconds };
+};
+
+const getPixelsPerSecond = (durationInSeconds: number): number => {
+  if (durationInSeconds < 1) return 10000;
+  if (durationInSeconds < 10) return 5000;
+  if (durationInSeconds < 60) return 1000;
+  if (durationInSeconds < 600) return 500;
+  return 100;
+};
+
+/**
+ * Generate waveform and duration from a file path
+ * @param filePath - The path to the file, needs to be in os.tmpdir()
+ * @returns - The waveform as json string and duration of the audio file
+ */
+export const generateWaveFormAndDurationFromFilePath = async (
+  filePath: string // Path might already beging with /tmp
+): Promise<{ waveform: string; durationInSeconds: number }> => {
+  const tmpDir = os.tmpdir();
+
+  const outJsoName = `${uuid()}.json`;
+  const outPath = path.join(tmpDir, outJsoName);
+
+  // Get duration of audio file
+  const durationInSeconds = await getAudioDurationInSeconds(filePath);
+  console.log("Duration: ", durationInSeconds, " seconds.");
+
+  const pixelsPerSecond = getPixelsPerSecond(durationInSeconds);
+
+  // Generate waveform
+  const cmd = `audiowaveform -i ${filePath} -o ${outPath} --pixels-per-second ${pixelsPerSecond} --bits 8`;
+  await execCommand(cmd);
+  console.log("Successfully generated waveform json file", outPath);
+
+  const waveform = await readJsonFile(outPath);
+
+  // If filePath starts with /tmp remove it from path
+  const editedFilePath = filePath.startsWith("/tmp")
+    ? filePath.slice(4)
+    : filePath;
+
+  await removeTempFiles([outJsoName, editedFilePath]);
 
   return { waveform, durationInSeconds };
 };

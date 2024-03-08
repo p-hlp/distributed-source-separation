@@ -3,11 +3,15 @@ import { useWavesurfer } from "@wavesurfer/react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
+import { axiosInstance } from "../../lib";
+import { queryClient } from "../../lib/queryClient";
 import { waveFormContainerHeight } from "../../sections/PlayerContainer";
+import { useActiveLibraryStore } from "../../store/activeLibraryStore";
 import { AudioFileResponse } from "../../types";
 import { AddRegionDialog, RegionType } from "./AddRegionDialog";
 import { AudioControls } from "./AudioControls";
 import { addMarker, addRegion } from "./regionUtils";
+import { durationToMaxZoom, mapToExportedRegions } from "./utils";
 
 const initVolume = 25;
 
@@ -22,6 +26,7 @@ interface RegionDialogState {
 
 export const WaveAudioPlayer = memo(({ file }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const currentLibraryId = useActiveLibraryStore.use.libraryId();
   const [regionDialogState, setRegionDialogState] = useState<RegionDialogState>(
     { open: false, regionType: undefined }
   );
@@ -104,11 +109,20 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
     regionsPlugin.clearRegions();
   }, [regionsPlugin, wavesurfer]);
 
-  const onExportRegions = useCallback(() => {
+  const onExportRegions = useCallback(async () => {
     if (!regionsPlugin) return;
-    // TODO export regions
+    const regions = regionsPlugin.getRegions();
+    const exportedRegions = mapToExportedRegions(regions);
+    if (!exportedRegions.length || !currentLibraryId) return;
     console.log("Exporting regions");
-  }, [regionsPlugin]);
+    const parentOrFileId = file.parentId || file.id;
+    await axiosInstance.post(
+      `/api/libraries/${currentLibraryId}/files/${file.id}/regions`,
+      { parentId: parentOrFileId, regions: exportedRegions }
+    );
+
+    queryClient.invalidateQueries({ queryKey: ["childFiles", parentOrFileId] });
+  }, [file, regionsPlugin, currentLibraryId]);
 
   return (
     <Stack direction="column" width={"100%"} height={"100%"}>
@@ -123,7 +137,10 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
       <AudioControls
         isPlaying={isPlaying}
         initVolume={initVolume}
-        initZoom={0}
+        zoomConfig={{
+          initZoom: 0,
+          zoomRange: { max: durationToMaxZoom(file.duration) },
+        }}
         on5Forward={on5Forward}
         on5Backward={on5Backward}
         onPlayPause={onPlayPause}

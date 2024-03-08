@@ -86,7 +86,7 @@ export const AddRegionDialog = ({
             margin="dense"
             id="length"
             label="Length in seconds"
-            type="decimal"
+            type="number"
             variant="standard"
             fullWidth
             value={regionLength}
