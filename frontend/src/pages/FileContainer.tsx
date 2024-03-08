@@ -8,7 +8,7 @@ interface Props {
 
 export const FileContainer = ({ libraryId }: Props) => {
   return (
-    <Stack direction="row" p={0} sx={{ width: "50%" }}>
+    <Stack direction="row" p={0} sx={{ width: "50%", height: "100%" }}>
       <Box sx={{ width: "50%" }}>
         <MainFileList libraryId={libraryId} />
       </Box>

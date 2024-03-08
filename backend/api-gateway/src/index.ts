@@ -30,7 +30,6 @@ import {
   ENV,
   EventType,
   FailedQueueResult,
-  QueueJobStatus,
 } from "./types";
 import { FileInfoResponse } from "./types/api";
 
@@ -162,21 +161,6 @@ const startUp = async () => {
       console.log("Client closed connection", clientId);
       sseConnections.delete(clientId);
     });
-  });
-
-  app.post("/send", (req: Request, res: Response) => {
-    const { message } = req.body;
-    const clientId = req.user?.id;
-    if (!clientId) return res.status(401).send("Unauthorized");
-    console.log("Sending message to client", message);
-    const response = {
-      type: EventType.message,
-      status: "done" as QueueJobStatus,
-      message: message as string,
-    };
-    const sseResponse = sseConnections.get(clientId);
-    if (sseResponse) sendEvent(sseResponse, response);
-    res.status(204).end();
   });
 
   app.get("/files/:id", async (req: Request, res: Response) => {

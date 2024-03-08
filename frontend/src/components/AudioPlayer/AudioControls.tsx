@@ -1,4 +1,9 @@
-import { Repeat, RepeatOn } from "@mui/icons-material";
+import {
+  DisabledByDefault,
+  Repeat,
+  RepeatOn,
+  SimCardDownload,
+} from "@mui/icons-material";
 import { Box, Checkbox, IconButton, Stack } from "@mui/material";
 import { FastForwardIcon, FastRewindIcon, PlayPauseIcon } from "../Icons";
 import { AddMarkerIcon } from "../Icons/AddMarkerIcon";
@@ -14,6 +19,8 @@ interface AudioControlsProps {
   onZoom?: (value: number) => void;
   onAddRegion?: () => void;
   onAddMarker?: () => void;
+  onExportRegions?: () => void;
+  onClearRegions?: () => void;
   onVolumeChange?: (volume: number) => void;
   on5Forward?: () => void;
   on5Backward?: () => void;
@@ -35,6 +42,12 @@ export const AudioControls = (props: AudioControlsProps) => {
         </IconButton>
         <IconButton onClick={props.onAddRegion}>
           <AddRegionIcon />
+        </IconButton>
+        <IconButton onClick={props.onClearRegions}>
+          <DisabledByDefault />
+        </IconButton>
+        <IconButton onClick={props.onExportRegions}>
+          <SimCardDownload />
         </IconButton>
       </Stack>
       <Box flexGrow={1} />

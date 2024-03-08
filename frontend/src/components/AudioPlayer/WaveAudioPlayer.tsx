@@ -1,21 +1,30 @@
 import { Divider, Stack } from "@mui/material";
 import { useWavesurfer } from "@wavesurfer/react";
-import { memo, useCallback, useEffect, useMemo, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
 import { waveFormContainerHeight } from "../../pages/PlayerContainer";
 import { AudioFileResponse } from "../../types";
+import { AddRegionDialog, RegionType } from "./AddRegionDialog";
 import { AudioControls } from "./AudioControls";
 import { addMarker, addRegion } from "./regionUtils";
 
-const initVolume = 50;
+const initVolume = 25;
 
 interface Props {
   file: AudioFileResponse;
 }
 
+interface RegionDialogState {
+  open: boolean;
+  regionType: RegionType;
+}
+
 export const WaveAudioPlayer = memo(({ file }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [regionDialogState, setRegionDialogState] = useState<RegionDialogState>(
+    { open: false, regionType: undefined }
+  );
 
   const regionsPlugin = useMemo(() => RegionsPlugin.create(), []);
   const timelinePlugin = useMemo(() => TimelinePlugin.create(), []);
@@ -66,7 +75,8 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
 
   const onChangeVolume = useCallback(
     (volume: number) => {
-      wavesurfer && wavesurfer.setVolume(volume / 100.0);
+      const newVolume = volume / 100.0;
+      wavesurfer && wavesurfer.setVolume(newVolume);
     },
     [wavesurfer]
   );
@@ -89,6 +99,29 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
     wavesurfer.skip(-5);
   }, [wavesurfer]);
 
+  const onAddMarker = useCallback(() => {
+    if (!wavesurfer) return;
+    if (isPlaying) onPlayPause();
+    setRegionDialogState({ open: true, regionType: "marker" });
+  }, [isPlaying, onPlayPause, wavesurfer]);
+
+  const onAddRegion = useCallback(() => {
+    if (!wavesurfer) return;
+    if (isPlaying) onPlayPause();
+    setRegionDialogState({ open: true, regionType: "region" });
+  }, [isPlaying, onPlayPause, wavesurfer]);
+
+  const onClearRegions = useCallback(() => {
+    if (!wavesurfer || !regionsPlugin) return;
+    regionsPlugin.clearRegions();
+  }, [regionsPlugin, wavesurfer]);
+
+  const onExportRegions = useCallback(() => {
+    if (!regionsPlugin) return;
+    // TODO export regions
+    console.log("Exporting regions");
+  }, [regionsPlugin]);
+
   return (
     <Stack direction="column" width={"100%"} height={"100%"}>
       <div
@@ -101,15 +134,32 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
       <Divider />
       <AudioControls
         isPlaying={isPlaying}
-        initVolume={50}
+        initVolume={initVolume}
         initZoom={0}
         on5Forward={on5Forward}
         on5Backward={on5Backward}
         onPlayPause={onPlayPause}
         onZoom={onZoomChange}
         onVolumeChange={onChangeVolume}
-        onAddMarker={() => addMarker("testMarker", wavesurfer, regionsPlugin)}
-        onAddRegion={() => addRegion("testRegion", wavesurfer, regionsPlugin)}
+        onAddMarker={onAddMarker}
+        onAddRegion={onAddRegion}
+        onExportRegions={onExportRegions}
+        onClearRegions={onClearRegions}
+      />
+      <AddRegionDialog
+        open={regionDialogState.open}
+        regionType={regionDialogState.regionType}
+        handleClose={() => {
+          setRegionDialogState({ open: false, regionType: undefined });
+        }}
+        onAddRegion={(type, name, length) => {
+          if (!wavesurfer || !regionsPlugin) return;
+          if (type && type === "marker")
+            addMarker(name, wavesurfer, regionsPlugin);
+          if (type && type === "region")
+            addRegion(name, wavesurfer, regionsPlugin, length);
+          setRegionDialogState({ open: false, regionType: undefined });
+        }}
       />
     </Stack>
   );

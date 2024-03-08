@@ -18,13 +18,15 @@ export const addMarker = (
 export const addRegion = (
   content: string,
   wavesurfer: WaveSurfer | undefined | null,
-  regionsPlugin: RegionsPlugin | undefined | null
+  regionsPlugin: RegionsPlugin | undefined | null,
+  length = 15
 ) => {
   if (!wavesurfer || !regionsPlugin) return;
+  console.log("length", length);
   return regionsPlugin.addRegion({
     content: content,
     start: wavesurfer.getCurrentTime(),
-    end: wavesurfer.getCurrentTime() + 30,
+    end: wavesurfer.getCurrentTime() + length,
     color: getRandomColor(),
   });
 };

@@ -29,6 +29,7 @@ export const CreateLibraryModal = ({
       onClose={handleClose}
       PaperProps={{
         component: "form",
+        sx: { minWidth: "20%" },
         onSubmit: async (event: React.FormEvent<HTMLFormElement>) => {
           event.preventDefault();
           const formData = new FormData(event.currentTarget);
@@ -47,7 +48,7 @@ export const CreateLibraryModal = ({
       }}
     >
       <DialogTitle>Create Library</DialogTitle>
-      <DialogContent>
+      <DialogContent dividers sx={{ pb: 4 }}>
         <TextField
           autoFocus
           required

@@ -12,8 +12,8 @@ import { SectionBar } from "../../components/SectionBar";
 import { queryClient } from "../../lib/queryClient";
 import { useActiveFileStore } from "../../store/activeFileStore";
 import { filesApi } from "../api/filesApi";
-import { uploadItem } from "./utils";
 import { FileUploadItem } from "./FileUploadItem";
+import { uploadItem } from "./utils";
 
 interface MainFileListProps {
   libraryId: string;
@@ -49,10 +49,10 @@ export const MainFileList = ({ libraryId }: MainFileListProps) => {
 
   if (!mainFiles) return null;
   return (
-    <Stack direction="column" overflow="auto" maxHeight="100%">
+    <Stack direction="column">
       <SectionBar sectionTitle="Files" />
       <Divider />
-      <List disablePadding>
+      <List disablePadding sx={{ overflow: "auto" }}>
         {mainFiles.map((file) => {
           return file.id === "upload" ? (
             <FileUploadItem
