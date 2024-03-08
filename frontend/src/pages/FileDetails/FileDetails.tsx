@@ -48,7 +48,6 @@ export const FileDetails = () => {
             />
             <InfoItem title="Library" value={fileInfo.libraryName} />
             <InfoItem title="Parent" value={fileInfo.parentName || "None"} />
-            <InfoItem title="Slices" value={fileInfo.slices.toString()} />
             <InfoItem title="Has Midi" value={fileInfo.hasMidi.toString()} />
             <InfoItem
               title="Has Transcription"

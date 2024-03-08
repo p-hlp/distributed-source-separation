@@ -46,18 +46,6 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
     // width: 1640,
   });
 
-  const regions = useMemo(() => {
-    return file.slices.map((slice) => {
-      return {
-        id: slice.id,
-        content: slice.name,
-        start: slice.start,
-        end: slice.end ?? undefined,
-        color: slice.color,
-      };
-    });
-  }, [file.slices]);
-
   // Main events
   useEffect(() => {
     if (!wavesurfer) return;

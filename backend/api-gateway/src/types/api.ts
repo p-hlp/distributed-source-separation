@@ -4,7 +4,6 @@ export interface FileInfoResponse {
   durationInSeconds: number;
   libraryName: string;
   parentName: string | undefined;
-  slices: number;
   hasMidi: boolean;
   hasTranscription: boolean;
   createdAt: string;

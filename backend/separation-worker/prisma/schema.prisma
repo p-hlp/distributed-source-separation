@@ -27,7 +27,6 @@ model AudioFile {
   other_AudioFile AudioFile[]    @relation("AudioFileToAudioFile")
   User            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   MidiFile        MidiFile?
-  Slice           Slice[]
   Transcription   Transcription?
 }
 
@@ -72,20 +71,7 @@ model Library {
   description String?
   userId      String
   createdAt   DateTime    @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime    @updatedAt
   AudioFile   AudioFile[]
   User        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Slice {
-  id          String    @id
-  sliceId     String    @unique
-  name        String
-  start       Float
-  end         Float?
-  color       String
-  audioFileId String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime
-  AudioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
 }

@@ -45,7 +45,6 @@ model AudioFile {
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   midiFile      MidiFile?
   transcription Transcription?
-  slices        Slice[]        
   libraryId     String?
   library       Library?       @relation(fields: [libraryId], references: [id], onDelete: Cascade)
   isVocal       Boolean        @default(false)
@@ -75,17 +74,3 @@ model Transcription {
   audioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
-
-model Slice {
-  id          String    @id @default(uuid())
-  sliceId     String    @unique
-  name        String
-  start       Float
-  end         Float?
-  color       String
-  audioFileId String    
-  audioFile   AudioFile @relation(fields: [audioFileId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-

@@ -130,10 +130,8 @@ librariesRouter.get("/:id/files", async (req: Request, res: Response) => {
     include: {
       midiFile: true,
       transcription: true,
-      slices: true,
       stems: {
         include: {
-          slices: true,
           midiFile: true,
           transcription: true,
         },
@@ -162,10 +160,8 @@ librariesRouter.get(
       include: {
         midiFile: true,
         transcription: true,
-        slices: true,
         stems: {
           include: {
-            slices: true,
             midiFile: true,
             transcription: true,
           },
@@ -194,7 +190,6 @@ librariesRouter.get(
       include: {
         midiFile: true,
         transcription: true,
-        slices: true,
       },
     });
     res.status(200).send(files);

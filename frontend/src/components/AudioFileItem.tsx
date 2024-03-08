@@ -1,9 +1,8 @@
 // FileItem.tsx
 import { Divider, ListItem, Stack, Typography, useTheme } from "@mui/material";
-import { memo, useMemo } from "react";
-import { RegionParams } from "wavesurfer.js/dist/plugins/regions.esm.js";
-import { AudioPlayer } from "./AudioPlayer";
+import { memo } from "react";
 import { AudioFileResponse } from "../types/apiTypes";
+import { AudioPlayer } from "./AudioPlayer";
 
 interface FileItemProps {
   file: AudioFileResponse;
@@ -11,19 +10,6 @@ interface FileItemProps {
 
 export const FileItem = memo(({ file }: FileItemProps) => {
   const theme = useTheme();
-
-  const regions: RegionParams[] = useMemo(() => {
-    return file.slices.map((slice) => {
-      const end = slice.end ?? undefined;
-      return {
-        id: slice.sliceId,
-        start: slice.start,
-        end: end,
-        color: slice.color,
-        content: slice.name,
-      };
-    });
-  }, [file]);
 
   return (
     <ListItem
@@ -45,7 +31,7 @@ export const FileItem = memo(({ file }: FileItemProps) => {
           filePath={file.filePath}
           peaks={[file.waveform.data]}
           duration={file.waveform.length / file.waveform.sample_rate}
-          existingRegions={regions}
+          existingRegions={[]}
         />
       </Stack>
     </ListItem>

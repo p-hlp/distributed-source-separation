@@ -206,6 +206,7 @@ export const AudioPlayerV2 = memo(
         <div ref={containerRef} style={{ width: "100%", padding: "16px" }} />
         <Divider />
         <AudioControls
+          initZoom={0}
           initVolume={50}
           onPlayPause={onPlayPause}
           onVolumeChange={onChangeVolume}

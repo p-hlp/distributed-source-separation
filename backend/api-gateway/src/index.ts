@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 dotenv.config();
 dotenv.config({ path: ".env.local" });
 
-import { Slice } from "@prisma/client";
 import cors from "cors";
 import express, { Express, Request, Response } from "express";
 import helmet from "helmet";
@@ -176,11 +175,9 @@ const startUp = async () => {
           include: {
             midiFile: true,
             transcription: true,
-            slices: true,
           },
         },
         midiFile: true,
-        slices: true,
         transcription: true,
       },
     });
@@ -241,7 +238,6 @@ const startUp = async () => {
       include: {
         stems: true,
         midiFile: true,
-        slices: true,
         transcription: true,
         library: true,
         parent: true,
@@ -255,7 +251,6 @@ const startUp = async () => {
       durationInSeconds: audioFile.duration,
       libraryName: audioFile.library?.name || "Unknown",
       parentName: audioFile.parent?.name || "Unknown",
-      slices: audioFile.slices.length,
       hasMidi: Boolean(audioFile.midiFile),
       hasTranscription: Boolean(audioFile.transcription),
       createdAt: audioFile.createdAt.toISOString(),
@@ -263,96 +258,6 @@ const startUp = async () => {
     };
     res.status(200).json(response);
   });
-
-  app.post("/files/:id/slices", async (req: Request, res: Response) => {
-    const user = req.user;
-    if (!user) return res.status(401).send("Unauthorized");
-    const id = req.params.id;
-    const slices = req.body.slices;
-    const sliceRecords = slices.map((slice: any) => {
-      return {
-        sliceId: slice.id,
-        name: slice.name,
-        start: slice.start,
-        end: slice.end,
-        audioFileId: id,
-        color: slice.color,
-      };
-    });
-
-    const response = await prisma.slice.createMany({ data: sliceRecords });
-    res.status(200).send(response);
-  });
-
-  app.post("/slices", async (req: Request, res: Response) => {
-    const user = req.user;
-    if (!user) return res.status(401).send("Unauthorized");
-    const { audioFileId, regions } = req.body;
-    console.log("regions", regions.length);
-    const slices: Slice[] = regions.map((region: any) => {
-      return {
-        sliceId: region.id,
-        name: region.name,
-        start: region.start,
-        end: region.end,
-        audioFileId: audioFileId,
-        color: region.color,
-      };
-    });
-
-    console.log("slices", slices);
-
-    const response = await prisma.slice.createMany({ data: slices });
-    console.log("response", response);
-
-    res.status(200).send({ message: "Regions saved" });
-  });
-
-  app.delete("/slices/:audioFileId", async (req: Request, res: Response) => {
-    const user = req.user;
-    if (!user) return res.status(401).send("Unauthorized");
-    const audioFileId = req.params.audioFileId;
-    try {
-      const result = await prisma.slice.deleteMany({
-        where: {
-          audioFileId: audioFileId,
-        },
-      });
-      console.log("Deleted slices:", result);
-      res.status(200).send({ message: `Regions deleted: ${result}` });
-    } catch (e) {
-      res.status(500).send({ message: "Error deleting regions" });
-    }
-  });
-
-  app.delete(
-    "/slices/:audioFileId/:sliceId",
-    async (req: Request, res: Response) => {
-      const user = req.user;
-      if (!user) return res.status(401).send("Unauthorized");
-      const audioFileId = req.params.audioFileId;
-      const sliceId = req.params.sliceId;
-
-      console.log(
-        "Trying to remove sliceId",
-        sliceId,
-        "from audioFileId",
-        audioFileId
-      );
-      try {
-        const result = await prisma.slice.delete({
-          where: {
-            audioFileId: audioFileId,
-            sliceId: sliceId,
-          },
-        });
-        console.log("Deleted slices", result);
-        res.status(200).send({ id: result.id, sliceId: result.sliceId });
-      } catch (e) {
-        res.status(500).send({ message: `Error deleting region ${sliceId}` });
-      }
-    }
-  );
 
   const preSignUrl = async (
     filePath: string,
