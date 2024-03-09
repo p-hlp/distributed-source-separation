@@ -365,10 +365,10 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
 
-auth0@4.2.0:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/auth0/-/auth0-4.2.0.tgz#b14f401f55a3b566e2f234bb63aba93df43e66ff"
-  integrity sha512-gn/MuwPC7tmWzgKD0jdrkc+/N1m93xiPhlKQNHmCMAeodW0YSvIniVfBN64V/WujUOjIPqXCH9YrMulQCqE6tg==
+auth0@4.3.1:
+  version "4.3.1"
+  resolved "https://registry.yarnpkg.com/auth0/-/auth0-4.3.1.tgz#7f91e3a4b9af6c5d9004b25025deb014fb0ed067"
+  integrity sha512-VuR/PdNHwXD9QiYUZf8UN0qiv07yJWHKfF2yEhePaPCrpwbEm6lHM6dkN7ylOdseogCkGmvchxYGMga0IPNrCA==
   dependencies:
     jose "^4.13.2"
     uuid "^9.0.0"
