@@ -1,4 +1,4 @@
-import { CloudDownload, Delete, MoreVert } from "@mui/icons-material";
+import { Delete, MoreVert } from "@mui/icons-material";
 import {
   IconButton,
   ListItemIcon,
@@ -53,11 +53,6 @@ export const HeaderComponent = ({
     navigate({ to: "/" });
   };
 
-  const handleExportLibrary = async () => {
-    console.log("Export Library", id);
-    handleClose();
-  };
-
   return (
     <Toolbar disableGutters sx={{ pl: 2, pr: 2 }}>
       <Typography variant="subtitle1" fontWeight={700} flexGrow={1}>
@@ -83,12 +78,6 @@ export const HeaderComponent = ({
           "aria-labelledby": "library-button",
         }}
       >
-        <MenuItem onClick={handleExportLibrary}>
-          <ListItemIcon>
-            <CloudDownload fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>Export Library</ListItemText>
-        </MenuItem>
         <MenuItem onClick={handleDeleteLibrary}>
           <ListItemIcon>
             <Delete fontSize="small" />

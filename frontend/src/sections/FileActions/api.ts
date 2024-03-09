@@ -27,9 +27,11 @@ export const getSignedUrl = async (filePath: string) => {
  * @param filePath - Direct filename to the object to download
  * @param fileName - Whatever the file is named when downloading
  */
-export const downloadFileMinio = async (filePath: string, fileName: string) => {
-  const signedUrl = await getSignedUrl(filePath);
-  const response = await rawAxiosInstance.get(signedUrl, {
+export const downloadFileMinio = async (
+  preSignedUrl: string,
+  fileName: string
+) => {
+  const response = await rawAxiosInstance.get(preSignedUrl, {
     responseType: "blob",
   });
   const url = window.URL.createObjectURL(new Blob([response.data]));

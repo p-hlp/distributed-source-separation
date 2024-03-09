@@ -1,3 +1,4 @@
+import archiver from "archiver";
 import express, { Request, Response } from "express";
 import fs from "fs/promises";
 import os from "os";
@@ -31,6 +32,7 @@ librariesRouter.get("/:id", async (req: Request, res: Response) => {
   if (!req.user) return res.status(401).send("Unauthorized");
   const user = req.user;
   const id = req.params.id;
+  const option = req.params.option;
 
   const library = await prisma.library.findUnique({
     where: {
@@ -38,7 +40,22 @@ librariesRouter.get("/:id", async (req: Request, res: Response) => {
       userId: user.id,
     },
     include: {
-      audioFiles: true,
+      audioFiles: option === "dense" ? false : true,
+    },
+  });
+  if (!library) return res.status(404).send("Library not found");
+  res.status(200).json(library);
+});
+
+librariesRouter.get("/:id/dense", async (req: Request, res: Response) => {
+  if (!req.user) return res.status(401).send("Unauthorized");
+  const user = req.user;
+  const id = req.params.id;
+
+  const library = await prisma.library.findUnique({
+    where: {
+      id: id,
+      userId: user.id,
     },
   });
   if (!library) return res.status(404).send("Library not found");
@@ -156,12 +173,12 @@ librariesRouter.get(
       include: {
         midiFile: true,
         transcription: true,
-        stems: {
-          include: {
-            midiFile: true,
-            transcription: true,
-          },
-        },
+        // stems: {
+        //   include: {
+        //     midiFile: true,
+        //     transcription: true,
+        //   },
+        // },
       },
     });
     if (!file) return res.status(404).send("File not found");
@@ -272,5 +289,114 @@ librariesRouter.post(
 
     await removeDir(path.join(os.tmpdir(), user.id));
     res.status(200).json(savedIds);
+  }
+);
+
+// // Provides a zip file with all the files in the library
+librariesRouter.get("/:id/export", async (req: Request, res: Response) => {
+  if (!req.user) return res.status(401).send("Unauthorized");
+  const user = req.user;
+  const libraryId = req.params.id;
+
+  const library = await prisma.library.findUnique({
+    where: {
+      id: libraryId,
+    },
+  });
+
+  if (!library) return res.status(404).send("Library not found");
+
+  const libraryName = library.name;
+
+  // Get every file that has library and no parent -> root files
+  const libraryFiles = await prisma.audioFile.findMany({
+    where: {
+      libraryId: libraryId,
+      userId: user.id,
+      parentId: null,
+    },
+    include: {
+      stems: true,
+    },
+  });
+
+  if (!libraryFiles.length)
+    return res.status(404).send(`No files in library: ${libraryId}.`);
+
+  // Setup archiver
+  const archive = archiver("zip", { zlib: { level: 9 } });
+  res.setHeader("Content-Type", "application/zip");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=${libraryName}.zip`
+  );
+  archive.pipe(res);
+
+  // Add every root file to the zip and add a folder with root file name
+  for (const file of libraryFiles) {
+    const fileStream = await minioClient.getObject(
+      ENV.MINIO_DEFAULT_BUCKET,
+      file.filePath
+    );
+    archive.append(fileStream, { name: `${file.name}.${file.fileType}` });
+    console.log("Appending file to zip: ", file.name);
+
+    for (const child of file.stems) {
+      const childStream = await minioClient.getObject(
+        ENV.MINIO_DEFAULT_BUCKET,
+        child.filePath
+      );
+      console.log("Appending child to zip: ", child.name);
+      archive.append(childStream, {
+        name: `${file.name}/${child.name}.${child.fileType}`,
+      });
+    }
+  }
+
+  archive.finalize();
+});
+
+librariesRouter.get(
+  "/:libraryId/files/:fileId/export",
+  async (req: Request, res: Response) => {
+    if (!req.user) return res.status(401).send("Unauthorized");
+    const user = req.user;
+    const libraryId = req.params.libraryId;
+    const fileId = req.params.fileId;
+
+    const file = await prisma.audioFile.findUnique({
+      where: {
+        id: fileId,
+        libraryId: libraryId,
+        userId: user.id,
+      },
+      include: {
+        stems: true,
+      },
+    });
+
+    if (!file) return res.status(404).send("File not found");
+    if (!file.stems.length)
+      return res.status(404).send("No associated files found.");
+
+    const archive = archiver("zip", { zlib: { level: 9 } });
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=${file.name}.zip`
+    );
+    archive.pipe(res);
+
+    for (const stem of file.stems) {
+      const stream = await minioClient.getObject(
+        ENV.MINIO_DEFAULT_BUCKET,
+        stem.filePath
+      );
+      archive.append(stream, {
+        name: `${file.name}/${stem.name}.${stem.fileType}`,
+      });
+    }
+
+    archive.finalize();
   }
 );

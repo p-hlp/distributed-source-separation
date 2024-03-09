@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
+import { downloadFileMinio, getAudioFile } from "../sections/FileActions/api";
 
 interface Props {
   title: string;
@@ -30,6 +31,13 @@ export const SubHeaderComponent = ({ title, fileId, isChildFile }: Props) => {
 
   const handleDeleteFile = () => {
     console.log("Delete File", fileId);
+    handleClose();
+  };
+
+  const handleDownloadFile = async () => {
+    const file = await getAudioFile(fileId);
+    if (!file) return;
+    await downloadFileMinio(file.preSignedUrl, file.name);
     handleClose();
   };
 
@@ -58,7 +66,7 @@ export const SubHeaderComponent = ({ title, fileId, isChildFile }: Props) => {
           "aria-labelledby": "file-button",
         }}
       >
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={handleDownloadFile}>
           <ListItemIcon>
             <Download fontSize="small" />
           </ListItemIcon>

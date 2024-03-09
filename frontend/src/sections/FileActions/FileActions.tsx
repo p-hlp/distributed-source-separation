@@ -1,6 +1,6 @@
 import { Box, Divider, List, Stack } from "@mui/material";
 import { SectionBar } from "../../components/SectionBar";
-import { DownloadFileAction } from "./DownloadFileAction";
+import { DownloadLibraryAction } from "./DownloadLibraryAction";
 import { DownloadMidiAction } from "./DownloadMidiAction";
 import { SeparationAction } from "./SeparateAction";
 import { TransrcibeAction } from "./TranscribeAction";
@@ -24,8 +24,8 @@ const actionConfig: ActionItem[] = [
     component: TransrcibeAction,
   },
   {
-    key: "download-file",
-    component: DownloadFileAction,
+    key: "download-library",
+    component: DownloadLibraryAction,
   },
 ];
 

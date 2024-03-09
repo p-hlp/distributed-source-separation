@@ -1,5 +1,8 @@
+import { Download } from "@mui/icons-material";
 import {
+  CircularProgress,
   Divider,
+  IconButton,
   List,
   ListItemButton,
   ListItemText,
@@ -7,14 +10,17 @@ import {
   Typography,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useIconColors } from "../../components/Icons";
 import { SectionBar } from "../../components/SectionBar";
+import { axiosInstance } from "../../lib";
 import { queryClient } from "../../lib/queryClient";
 import { useActiveFileStore } from "../../store/activeFileStore";
 import { useActiveLibraryStore } from "../../store/activeLibraryStore";
+import { AudioFileResponse } from "../../types";
 import { filesApi } from "../api/filesApi";
-import { uploadItem } from "./utils";
 import { FileUploadItem } from "./FileUploadItem";
+import { uploadItem } from "./utils";
 
 export const ChildrenFileList = () => {
   const currentMainFileId = useActiveFileStore.use.fileId();
@@ -22,6 +28,8 @@ export const ChildrenFileList = () => {
   const setChildFile = useActiveFileStore.use.setChildFile();
   const currentLibraryId = useActiveLibraryStore.use.libraryId();
   const api = filesApi(currentLibraryId ?? "");
+  const [donwloadInProgress, setDownloadInProgress] = useState(false);
+  const { lightIconColor } = useIconColors();
 
   const { data } = useQuery({
     queryKey: ["childFiles", currentMainFileId],
@@ -48,9 +56,48 @@ export const ChildrenFileList = () => {
     [api, currentMainFileId]
   );
 
+  const handleDonwload = async () => {
+    if (!currentMainFileId) return;
+    setDownloadInProgress(true);
+
+    const mainFileResponse = await axiosInstance.get<AudioFileResponse>(
+      `/api/libraries/${currentLibraryId}/files/${currentMainFileId}`
+    );
+    const mainFileName = mainFileResponse.data.name;
+    const response = await axiosInstance.get(
+      `/api/libraries/${currentLibraryId}/files/${currentMainFileId}/export`,
+      {
+        responseType: "blob",
+      }
+    );
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+
+    link.setAttribute("download", `${mainFileName}.zip`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setDownloadInProgress(false);
+  };
+
+  const disabled =
+    donwloadInProgress || !currentMainFileId || !data || !data.length;
+
   return (
     <Stack direction="column" overflow="auto" maxHeight="100%">
-      <SectionBar sectionTitle="Associated Files" />
+      <SectionBar
+        sectionTitle="Associated Files"
+        endAdornment={
+          <IconButton disabled={disabled} onClick={handleDonwload}>
+            {donwloadInProgress ? (
+              <CircularProgress size={24} sx={{ color: lightIconColor }} />
+            ) : (
+              <Download />
+            )}
+          </IconButton>
+        }
+      />
       <Divider />
       <List disablePadding>
         {childFiles.map((file) => {
