@@ -35,11 +35,9 @@ export const DownloadMidiAction = () => {
 
   const midiDownloadHandler = useCallback(async () => {
     if (!activeFileId) return;
-    console.log("Downloading midi for file", activeFileId);
-    // Get midi file for activeFileId
     const midiFile = await getMidiFile(activeFileId!);
     if (!midiFile) return;
-    await downloadFileMinio(midiFile.filePath, midiFile.name);
+    await downloadFileMinio(midiFile.filePath, midiFile.name, false);
     setInProgress(false);
   }, [activeFileId]);
 

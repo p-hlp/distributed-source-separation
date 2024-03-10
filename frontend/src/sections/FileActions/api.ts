@@ -27,11 +27,18 @@ export const getSignedUrl = async (filePath: string) => {
  * Downloads a file from minio
  * @param filePath - Direct filename to the object to download
  * @param fileName - Whatever the file is named when downloading
+ * @param isPresigned - Whether the fileUrl is presigned or not
  */
 export const downloadFileMinio = async (
-  preSignedUrl: string,
-  fileName: string
+  fileUrl: string,
+  fileName: string,
+  isPresigned = true
 ) => {
+  let preSignedUrl = fileUrl;
+  if (!isPresigned) {
+    preSignedUrl = await getSignedUrl(fileUrl);
+  }
+
   const response = await rawAxiosInstance.get(preSignedUrl, {
     responseType: "blob",
   });

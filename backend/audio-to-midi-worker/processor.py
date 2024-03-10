@@ -164,11 +164,12 @@ class Processor:
                 metadata={"mimeType": "audio/midi", "name": midi_file, "tempo": tempo},
             )
 
-            # Create MidiFile record in database and update MidiFile on AudioFile
+            # Basic Pitch appends _basic_pitch to the file name, remove it
+            midi_file_name = midi_file.replace("_basic_pitch", "")
             midi_file = await self.prisma.midifile.create(
                 {
                     "userId": userId,
-                    "name": midi_file,
+                    "name": midi_file_name,
                     "filePath": object_name,
                     "audioFileId": audioFileId,
                 }
