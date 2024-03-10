@@ -5,9 +5,8 @@ import { useActiveLibraryStore } from "../store/activeLibraryStore";
 
 export const ErrorComponent = () => {
   const navigate = useNavigate();
-  const resetLibrary = useActiveLibraryStore.use.resetLibrary();
-  const resetFile = useActiveFileStore.use.resetFile();
-  const resetChildFile = useActiveFileStore.use.resetChildFile();
+  const { resetLibrary } = useActiveLibraryStore();
+  const { resetFile, resetChildFile } = useActiveFileStore();
 
   useEffect(() => {
     resetLibrary();

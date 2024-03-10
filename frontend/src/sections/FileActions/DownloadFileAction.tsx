@@ -1,27 +1,28 @@
 import { Divider, ListItemButton, ListItemText, Stack } from "@mui/material";
-import { useSelectedFileId } from "../../hooks/useSelectedFileId";
+import { useActiveFileStore } from "../../store/activeFileStore";
 import { downloadFileMinio, getAudioFile } from "./api";
 
 export const DownloadFileAction = () => {
-  const { selectedFileId, mainFileId } = useSelectedFileId();
+  const { fileId: mainFileId, childFileId } = useActiveFileStore();
+  const activeFileId = childFileId ?? mainFileId;
 
-  const disabled = !selectedFileId;
+  const disabled = !activeFileId;
 
   const handleClick = async () => {
-    if (!selectedFileId) {
+    if (!activeFileId) {
       console.error("File not found");
       return;
     }
 
-    if (mainFileId && mainFileId !== selectedFileId) {
+    if (mainFileId && mainFileId !== activeFileId) {
       const mainFile = await getAudioFile(mainFileId);
       if (!mainFile) return;
-      const childFile = await getAudioFile(selectedFileId);
+      const childFile = await getAudioFile(activeFileId);
       if (!childFile) return;
       const fileName = `${mainFile.name} - ${childFile.name}`;
       await downloadFileMinio(childFile.filePath, fileName);
     } else {
-      const file = await getAudioFile(selectedFileId);
+      const file = await getAudioFile(activeFileId);
       if (!file) return;
       await downloadFileMinio(file.filePath, file.name);
     }

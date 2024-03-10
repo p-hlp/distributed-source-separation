@@ -23,10 +23,12 @@ import { FileUploadItem } from "./FileUploadItem";
 import { uploadItem } from "./utils";
 
 export const ChildrenFileList = () => {
-  const currentMainFileId = useActiveFileStore.use.fileId();
-  const currentChildFileId = useActiveFileStore.use.childFileId();
-  const setChildFile = useActiveFileStore.use.setChildFile();
-  const currentLibraryId = useActiveLibraryStore.use.libraryId();
+  const {
+    fileId: currentMainFileId,
+    childFileId: currentChildFileId,
+    setChildFile,
+  } = useActiveFileStore();
+  const { libraryId: currentLibraryId } = useActiveLibraryStore();
   const api = filesApi(currentLibraryId ?? "");
   const [donwloadInProgress, setDownloadInProgress] = useState(false);
   const { lightIconColor } = useIconColors();

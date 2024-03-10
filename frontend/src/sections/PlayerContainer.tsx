@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { memo } from "react";
 import { WaveAudioPlayer } from "../components/AudioPlayer/WaveAudioPlayer";
 import { SubHeaderComponent } from "../components/SubHeaderComponent";
-import { useSelectedFileId } from "../hooks/useSelectedFileId";
+import { useActiveFileStore } from "../store/activeFileStore";
 import { getAudioFile } from "./FileActions/api";
 
 export const waveFormContainerHeight = 180;
@@ -18,22 +18,22 @@ const NoFilePlaceholder = () => {
 };
 
 export const AudioPlayerContainer = memo(() => {
-  const { selectedFileId } = useSelectedFileId();
+  const { fileId: mainFileId, childFileId } = useActiveFileStore();
+  const fileId = childFileId ?? mainFileId;
 
   const { data: file } = useQuery({
-    queryKey: ["audioFile", selectedFileId],
-    queryFn: () => getAudioFile(selectedFileId!),
-    enabled: Boolean(selectedFileId),
+    queryKey: ["audioFile", fileId],
+    queryFn: () => getAudioFile(fileId!),
+    enabled: Boolean(fileId),
   });
 
   if (!file) return <NoFilePlaceholder />;
-  console.log("preSignedUrl", file.preSignedUrl);
   return (
     <Stack direction="column" height={containerHeight} width={"100%"}>
       <SubHeaderComponent
         title={file.name}
         fileId={file.id}
-        isChildFile={!file.stems}
+        isChildFile={!file.stems?.length}
       />
       <Divider />
       <WaveAudioPlayer file={file} />

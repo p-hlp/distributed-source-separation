@@ -15,9 +15,8 @@ import { useActiveLibraryStore } from "../store/activeLibraryStore";
 export const MenuBar = () => {
   const { isAuthenticated, user, logout } = useAuth0();
   const navigate = useNavigate();
-  const resetLibrary = useActiveLibraryStore.use.resetLibrary();
-  const resetFile = useActiveFileStore.use.resetFile();
-  const resetChildFile = useActiveFileStore.use.resetChildFile();
+  const { resetLibrary } = useActiveLibraryStore();
+  const { resetFile, resetChildFile } = useActiveFileStore();
 
   const handleLogout = () => {
     logout({ logoutParams: { returnTo: window.location.origin } });

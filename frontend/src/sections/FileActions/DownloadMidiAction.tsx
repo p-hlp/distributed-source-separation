@@ -7,23 +7,24 @@ import {
 } from "@mui/material";
 import { useCallback, useState } from "react";
 import { useRegisterSSEListener } from "../../hooks/useRegisterSSEListener";
-import { useSelectedFileId } from "../../hooks/useSelectedFileId";
 import { axiosInstance } from "../../lib";
+import { useActiveFileStore } from "../../store/activeFileStore";
 import { downloadFileMinio, getMidiFile } from "./api";
 
 export const DownloadMidiAction = () => {
-  const { selectedFileId } = useSelectedFileId();
+  const { fileId, childFileId } = useActiveFileStore();
+  const activeFileId = childFileId ?? fileId;
 
   const [inProgress, setInProgress] = useState(false);
 
-  const disabled = !selectedFileId || inProgress;
+  const disabled = !activeFileId || inProgress;
 
   const handleClick = async () => {
-    if (!selectedFileId) {
+    if (!activeFileId) {
       console.error("File not found");
     }
     const job = await axiosInstance.post("/midi", {
-      audioFileId: selectedFileId,
+      audioFileId: activeFileId,
     });
 
     console.log("Midi conversion job", job);
@@ -33,14 +34,14 @@ export const DownloadMidiAction = () => {
   };
 
   const midiDownloadHandler = useCallback(async () => {
-    if (!selectedFileId) return;
-    console.log("Downloading midi for file", selectedFileId);
-    // Get midi file for selectedFileId
-    const midiFile = await getMidiFile(selectedFileId!);
+    if (!activeFileId) return;
+    console.log("Downloading midi for file", activeFileId);
+    // Get midi file for activeFileId
+    const midiFile = await getMidiFile(activeFileId!);
     if (!midiFile) return;
     await downloadFileMinio(midiFile.filePath, midiFile.name);
     setInProgress(false);
-  }, [selectedFileId]);
+  }, [activeFileId]);
 
   useRegisterSSEListener([
     {

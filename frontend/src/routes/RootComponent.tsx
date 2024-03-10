@@ -29,9 +29,8 @@ export const RootComponent = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const barHeight = useAppBarHeight();
-  const setLibrary = useActiveLibraryStore.use.setLibrary();
-  const resetFile = useActiveFileStore.use.resetFile();
-  const resetChildFile = useActiveFileStore.use.resetChildFile();
+  const { setLibrary } = useActiveLibraryStore();
+  const { resetFile, resetChildFile } = useActiveFileStore();
 
   useDocumentTitle("NeuraLib");
 

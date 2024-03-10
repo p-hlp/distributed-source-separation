@@ -1,8 +1,8 @@
 import { Box, Divider, Stack, Typography, useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { SectionBar } from "../../components/SectionBar";
-import { useSelectedFileId } from "../../hooks/useSelectedFileId";
 import { formatDuration } from "../../shared/timeUtils";
+import { useActiveFileStore } from "../../store/activeFileStore";
 import { getFileInfo } from "./api";
 
 const NotSelectedComponent = () => {
@@ -25,12 +25,13 @@ const formatIsoDate = (date: string) => {
 };
 
 export const FileDetails = () => {
-  const { selectedFileId } = useSelectedFileId();
+  const { fileId, childFileId } = useActiveFileStore();
+  const activeFileId = childFileId ?? fileId;
 
   const { data: fileInfo } = useQuery({
-    queryKey: ["fileInfo", selectedFileId],
-    queryFn: () => getFileInfo(selectedFileId!),
-    enabled: Boolean(selectedFileId),
+    queryKey: ["fileInfo", activeFileId],
+    queryFn: () => getFileInfo(activeFileId!),
+    enabled: Boolean(activeFileId),
   });
 
   return (

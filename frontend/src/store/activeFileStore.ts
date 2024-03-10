@@ -5,7 +5,7 @@ import { createSelectors } from "./utils";
 interface ActiveFileState {
   fileId: string | undefined;
   childFileId: string | undefined;
-  setFile: (id: string) => void;
+  setFile: (id: string | undefined) => void;
   resetFile: () => void;
   setChildFile: (id: string) => void;
   resetChildFile: () => void;

@@ -196,7 +196,7 @@ const startUp = async () => {
         id: id,
       },
     });
-    res.status(200).send(file);
+    res.status(200).json(file.id);
   });
 
   app.get("/files/:id/transcription", async (req: Request, res: Response) => {

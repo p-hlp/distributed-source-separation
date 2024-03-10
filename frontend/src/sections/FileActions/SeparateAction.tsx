@@ -8,36 +8,37 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { useRegisterSSEListener } from "../../hooks/useRegisterSSEListener";
-import { useSelectedFileId } from "../../hooks/useSelectedFileId";
 import { axiosInstance } from "../../lib";
 import { queryClient } from "../../lib/queryClient";
+import { useActiveFileStore } from "../../store/activeFileStore";
 import { useActiveLibraryStore } from "../../store/activeLibraryStore";
 import { getAudioFile } from "./api";
 
 export const SeparationAction = () => {
-  const { selectedFileId } = useSelectedFileId();
-  const libraryId = useActiveLibraryStore.use.libraryId();
+  const { fileId, childFileId } = useActiveFileStore();
+  const activeFileId = childFileId ?? fileId;
+  const { libraryId } = useActiveLibraryStore();
 
   const [inProgress, setInProgress] = useState(false);
 
   const { data: file } = useQuery({
-    queryKey: ["audioFile", selectedFileId],
-    queryFn: () => getAudioFile(selectedFileId!),
-    enabled: Boolean(selectedFileId),
+    queryKey: ["audioFile", activeFileId],
+    queryFn: () => getAudioFile(activeFileId!),
+    enabled: Boolean(activeFileId),
   });
 
   const disabled =
-    !selectedFileId || !libraryId || !file || file.isSeparated || inProgress;
+    !activeFileId || !libraryId || !file || file.isSeparated || inProgress;
 
   const handleClick = async () => {
-    if (!file || file.id != selectedFileId) {
+    if (!file || file.id != activeFileId) {
       console.error("File not found");
       return;
     }
 
     setInProgress(true);
     const response = await axiosInstance.post("/separate", {
-      audioFileId: selectedFileId,
+      audioFileId: activeFileId,
       libraryId: libraryId,
     });
     console.log(response);

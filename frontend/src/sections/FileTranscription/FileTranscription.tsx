@@ -1,16 +1,16 @@
 import { Box, Divider, Stack, Typography } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { SectionBar } from "../../components/SectionBar";
-import { useSelectedFileId } from "../../hooks/useSelectedFileId";
+import { useActiveFileStore } from "../../store/activeFileStore";
 import { getTranscription } from "./api";
 
 export const FileTranscription = () => {
-  const { selectedFileId } = useSelectedFileId();
-
+  const { fileId, childFileId } = useActiveFileStore();
+  const activeFileId = childFileId ?? fileId;
   const { data: transcription } = useQuery({
-    queryKey: ["transcription", selectedFileId],
-    queryFn: () => getTranscription(selectedFileId!),
-    enabled: Boolean(selectedFileId),
+    queryKey: ["transcription", activeFileId],
+    queryFn: () => getTranscription(activeFileId!),
+    enabled: Boolean(activeFileId),
   });
 
   return (

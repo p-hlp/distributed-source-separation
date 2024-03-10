@@ -36,7 +36,7 @@ export const CreateLibraryModal = ({
   open,
   handleClose,
 }: CreateLibraryModalProps) => {
-  const setLibrary = useActiveLibraryStore.use.setLibrary();
+  const { setLibrary } = useActiveLibraryStore();
   const navigate = useNavigate();
 
   const {

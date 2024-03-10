@@ -22,9 +22,7 @@ interface MainFileListProps {
 // TODO - Don't pass libraryId use from zustand store
 export const MainFileList = ({ libraryId }: MainFileListProps) => {
   const api = filesApi(libraryId);
-  const fileId = useActiveFileStore.use.fileId();
-  const setFile = useActiveFileStore.use.setFile();
-  const resetChildFile = useActiveFileStore.use.resetChildFile();
+  const { setFile, fileId, resetChildFile } = useActiveFileStore();
 
   const { data } = useQuery({
     queryKey: ["mainFiles", libraryId],

@@ -11,19 +11,19 @@ import { useActiveLibraryStore } from "../../store/activeLibraryStore";
 import { Library } from "../../types";
 
 export const DownloadLibraryAction = () => {
-  const selectedLibraryId = useActiveLibraryStore.use.libraryId();
+  const { libraryId } = useActiveLibraryStore();
   const [inProgress, setInprogress] = useState(false);
 
   const handleExportLibrary = async () => {
-    if (!selectedLibraryId) return;
+    if (!libraryId) return;
     setInprogress(true);
     try {
       const libraryResponse = await axiosInstance.get<Library>(
-        `/api/libraries/${selectedLibraryId}/dense`
+        `/api/libraries/${libraryId}/dense`
       );
       const libraryName = libraryResponse.data.name;
       const response = await axiosInstance.get(
-        `/api/libraries/${selectedLibraryId}/export`,
+        `/api/libraries/${libraryId}/export`,
         {
           responseType: "blob",
         }

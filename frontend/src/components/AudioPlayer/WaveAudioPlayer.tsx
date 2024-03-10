@@ -26,7 +26,7 @@ interface RegionDialogState {
 
 export const WaveAudioPlayer = memo(({ file }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const currentLibraryId = useActiveLibraryStore.use.libraryId();
+  const { libraryId } = useActiveLibraryStore();
   const [regionDialogState, setRegionDialogState] = useState<RegionDialogState>(
     { open: false, regionType: undefined }
   );
@@ -113,16 +113,16 @@ export const WaveAudioPlayer = memo(({ file }: Props) => {
     if (!regionsPlugin) return;
     const regions = regionsPlugin.getRegions();
     const exportedRegions = mapToExportedRegions(regions);
-    if (!exportedRegions.length || !currentLibraryId) return;
+    if (!exportedRegions.length || !libraryId) return;
     console.log("Exporting regions");
     const parentOrFileId = file.parentId || file.id;
     await axiosInstance.post(
-      `/api/libraries/${currentLibraryId}/files/${file.id}/regions`,
+      `/api/libraries/${libraryId}/files/${file.id}/regions`,
       { parentId: parentOrFileId, regions: exportedRegions }
     );
 
     queryClient.invalidateQueries({ queryKey: ["childFiles", parentOrFileId] });
-  }, [file, regionsPlugin, currentLibraryId]);
+  }, [file, regionsPlugin, libraryId]);
 
   return (
     <Stack direction="column" width={"100%"} height={"100%"}>

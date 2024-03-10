@@ -28,8 +28,8 @@ export const HeaderComponent = ({
   library: { id, name, description },
 }: Props) => {
   const api = libraryApi();
-  const resetFile = useActiveFileStore.use.resetFile();
-  const resetLibrary = useActiveLibraryStore.use.resetLibrary();
+  const { resetFile } = useActiveFileStore();
+  const { resetLibrary } = useActiveLibraryStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
