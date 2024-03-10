@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material";
 import { useState } from "react";
-import { useIconColors } from "../Icons";
+import { useIconColors } from "../../Icons";
 import { ImpSlider } from "./ImpSlider";
 import { TinyText } from "./TinyText";
 

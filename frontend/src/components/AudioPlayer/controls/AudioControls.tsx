@@ -5,8 +5,8 @@ import {
   SimCardDownload,
 } from "@mui/icons-material";
 import { Box, Checkbox, IconButton, Stack } from "@mui/material";
-import { FastForwardIcon, FastRewindIcon, PlayPauseIcon } from "../Icons";
-import { AddRegionIcon } from "../Icons/AddRegionIcon";
+import { FastForwardIcon, FastRewindIcon, PlayPauseIcon } from "../../Icons";
+import { AddRegionIcon } from "../../Icons/AddRegionIcon";
 import { VolumeControl } from "./VolumeControl";
 import { ZoomControl } from "./ZoomControl";
 

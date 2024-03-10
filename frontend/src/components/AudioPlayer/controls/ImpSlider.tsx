@@ -1,5 +1,5 @@
 import { Slider, SliderProps } from "@mui/material";
-import { useIconColors } from "../Icons";
+import { useIconColors } from "../../Icons";
 
 export const ImpSlider = (props: SliderProps) => {
   const { sliderColor } = useIconColors();

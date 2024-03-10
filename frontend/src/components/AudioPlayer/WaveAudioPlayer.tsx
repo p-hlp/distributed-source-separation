@@ -9,7 +9,7 @@ import { waveFormContainerHeight } from "../../sections/PlayerContainer";
 import { useActiveLibraryStore } from "../../store/activeLibraryStore";
 import { AudioFileResponse } from "../../types";
 import { AddRegionDialog, RegionType } from "./AddRegionDialog";
-import { AudioControls } from "./AudioControls";
+import { AudioControls } from "./controls/AudioControls";
 import { addMarker, addRegion } from "./regionUtils";
 import { durationToMaxZoom, mapToExportedRegions } from "./utils";
 

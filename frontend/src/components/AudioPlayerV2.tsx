@@ -10,7 +10,7 @@ import TimelinePlugin from "wavesurfer.js/dist/plugins/timeline.esm.js";
 import ZoomPlugin from "wavesurfer.js/dist/plugins/zoom.esm.js";
 import { axiosInstance } from "../lib";
 import { queryClient } from "../lib/queryClient";
-import { AudioControls } from "./AudioPlayer/AudioControls";
+import { AudioControls } from "./AudioPlayer/controls/AudioControls";
 
 interface AudioPlayerProps {
   audioFileId: string;
