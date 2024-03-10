@@ -79,7 +79,7 @@ Check out the [USAGE](./USAGE.md) section for everything you need to get started
 
 ## Update History
 
-As this isn't really a product ready for use there are no official changelogs. See [commit history](/commits).
+As this isn't really a product ready for use there are no official changelogs. See [commit history](https://github.com/p-hlp/distributed-source-separation/commits).
 
 ## Links
 
