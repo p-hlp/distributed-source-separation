@@ -1,13 +1,28 @@
-# Distributed Source Separation & Sampling
+# NeuraLib - Intelligent Sample Management and Processing
 
-This projects aims to provide a platform to manage music, stems and samples by providing the following features:
+![GUI Screenshot](docs/assets/screenshot2.png)
 
-- Library management (upload/export)
-- Source Separation / Stemming into Vocals/Bass/Drums/Other (Meta/Defossez DemucsHT)
-- Playback / Sample Slicing
-- (Automatic Sample Classification)
-- Audio to Midi (Spotify Basic-Pitch)
-- Audio to Text for Vocal (OpenAI Whisper)
+## What is it?
+
+- NeuraLib is a distributed sample management and processing platform
+- Leverages multiple state-of-the-art neural networks for audio processing
+  - Source Separation (extract vocals, bass, drums and other using Demucs)
+  - Vocal Transcription (using OpenAI Whisper)
+  - Audio to Midi conversion (convert audio to midi, for further use in your DAW )
+- Enables audio file library management (import/export your audio files and libraries)
+- Streamed playback (stream large audio files without needing to download the whole file)
+- Sample slicing (heard a sick snare in a track? separate the song and slice the drum loop to get it easily)
+
+## Why does it exist?
+
+## System Components
+
+- [Frontend](frontend/README.md)
+- [Backend](backend/README.md)
+  - [API-Gateway](backend/api-gateway/README.md)
+  - [Separation Worker](backend/separation-worker/README.md)
+  - [Audio To Midi Worker](backend/audio-to-midi-worker/README.md)
+  - [Transcription Worker](backend/transcription-worker/README.md)
 
 ## Architecture / Technologies Used
 
