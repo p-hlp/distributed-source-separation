@@ -1,17 +1,115 @@
 name: tf-audio
 channels:
   - defaults
-  - conda-forge
 dependencies:
-  - python=3.10
-  - pip
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=5.1
+  - bzip2=1.0.8
+  - ca-certificates=2023.12.12
+  - ld_impl_linux-64=2.38
+  - libffi=3.4.4
+  - libgcc-ng=11.2.0
+  - libgomp=11.2.0
+  - libstdcxx-ng=11.2.0
+  - libuuid=1.41.5
+  - ncurses=6.4
+  - openssl=3.0.13
+  - pip=23.3.1
+  - python=3.10.13
+  - readline=8.2
+  - setuptools=68.2.2
+  - sqlite=3.41.2
+  - tk=8.6.12
+  - tzdata=2024a
+  - wheel=0.41.2
+  - xz=5.4.5
+  - zlib=1.2.13
   - pip:
-      - tensorflow[and-cuda]
-      # - git+https://github.com/p-hlp/basic-pitch@master
-      # - librosa==0.10.1
-      # - minio==7.2.3
-      # - prisma==0.12.0
-      # - dotenv==0.0.5
-      # - pretty_midi==0.2.10
-      # - bullmq==2.2.2
-      # - uuid==1.30
+      - absl-py==2.1.0
+      - annotated-types==0.6.0
+      - anyio==4.3.0
+      - argon2-cffi==23.1.0
+      - argon2-cffi-bindings==21.2.0
+      - astunparse==1.6.3
+      - async-timeout==4.0.3
+      - audioread==3.0.1
+      - basic-pitch==0.2.6
+      - bullmq==2.2.2
+      - cachetools==5.3.2
+      - certifi==2024.2.2
+      - cffi==1.16.0
+      - charset-normalizer==3.3.2
+      - click==8.1.7
+      - decorator==5.1.1
+      - exceptiongroup==1.2.0
+      - flatbuffers==23.5.26
+      - future==1.0.0
+      - gast==0.5.4
+      - google-auth==2.28.1
+      - google-auth-oauthlib==1.2.0
+      - google-pasta==0.2.0
+      - grpcio==1.62.0
+      - h11==0.14.0
+      - h5py==3.10.0
+      - httpcore==1.0.4
+      - httpx==0.27.0
+      - idna==3.6
+      - jinja2==3.1.3
+      - joblib==1.3.2
+      - keras==2.15.0
+      - lazy-loader==0.3
+      - libclang==16.0.6
+      - librosa==0.10.1
+      - llvmlite==0.42.0
+      - markdown==3.5.2
+      - markupsafe==2.1.5
+      - mido==1.3.2
+      - minio==7.2.4
+      - mir-eval==0.7
+      - ml-dtypes==0.2.0
+      - msgpack==1.0.7
+      - nodeenv==1.8.0
+      - numba==0.59.0
+      - numpy==1.23.5
+      - oauthlib==3.2.2
+      - opt-einsum==3.3.0
+      - packaging==23.2
+      - platformdirs==4.2.0
+      - pooch==1.8.1
+      - pretty-midi==0.2.10
+      - prisma==0.12.0
+      - protobuf==4.25.3
+      - pyasn1==0.5.1
+      - pyasn1-modules==0.3.0
+      - pycparser==2.21
+      - pycryptodome==3.20.0
+      - pydantic==2.6.2
+      - pydantic-core==2.16.3
+      - pysoundfile==0.9.0.post1
+      - python-dotenv==1.0.1
+      - redis==5.0.1
+      - requests==2.31.0
+      - requests-oauthlib==1.3.1
+      - resampy==0.4.2
+      - rsa==4.9
+      - scikit-learn==1.4.1.post1
+      - scipy==1.12.0
+      - semver==2.13.0
+      - six==1.16.0
+      - sniffio==1.3.1
+      - soundfile==0.12.1
+      - soxr==0.3.7
+      - strenum==0.4.15
+      - tensorboard==2.15.2
+      - tensorboard-data-server==0.7.2
+      - tensorflow==2.15.0.post1
+      - tensorflow-estimator==2.15.0
+      - tensorflow-io-gcs-filesystem==0.36.0
+      - termcolor==2.4.0
+      - threadpoolctl==3.3.0
+      - tomlkit==0.12.3
+      - typing-extensions==4.10.0
+      - urllib3==2.2.1
+      - uuid==1.30
+      - werkzeug==3.0.1
+      - wrapt==1.14.1
