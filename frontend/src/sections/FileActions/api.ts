@@ -1,5 +1,6 @@
 import { axiosInstance, rawAxiosInstance } from "../../lib";
 import { AudioFileResponse, MidiFileResponse } from "../../types";
+import { sanitizeFileName } from "./utils";
 
 export const getAudioFile = async (audioFileId: string) => {
   const response = await axiosInstance.get<AudioFileResponse>(
@@ -37,7 +38,7 @@ export const downloadFileMinio = async (
   const url = window.URL.createObjectURL(new Blob([response.data]));
   const link = document.createElement("a");
   link.href = url;
-  link.setAttribute("download", fileName);
+  link.setAttribute("download", sanitizeFileName(fileName));
   document.body.appendChild(link);
   link.click();
 };
