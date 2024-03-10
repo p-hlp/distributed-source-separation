@@ -251,10 +251,12 @@ librariesRouter.post(
     // Get file from database and minio
     const audioFile = await prisma.audioFile.findUnique({
       where: { id: fileId },
-      select: { id: true, filePath: true, fileType: true },
+      select: { id: true, filePath: true, fileType: true, isVocal: true },
     });
 
     if (!audioFile) res.status(404).send("File not found");
+
+    const isVocal = Boolean(audioFile?.isVocal);
 
     console.log("Fetched audio file from database: ", audioFile?.id);
     const filePath = audioFile?.filePath as string;
@@ -282,7 +284,8 @@ librariesRouter.post(
         region.name,
         fileType,
         region.start,
-        region.end - region.start
+        region.end - region.start,
+        isVocal
       );
       savedIds.push(savedRegionId);
     }

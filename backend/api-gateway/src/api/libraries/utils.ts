@@ -68,7 +68,8 @@ export const segmentAndSaveLocal = async (
   fileName: string,
   fileType: string,
   start: number,
-  duration: number
+  duration: number,
+  isVocal = false
 ) => {
   const tmpFolder = os.tmpdir();
   const objectName = `${userId}/${uuid()}.${fileType}`;
@@ -111,6 +112,7 @@ export const segmentAndSaveLocal = async (
       fileType: fileType,
       duration: durationInSeconds,
       waveform: waveform,
+      isVocal: isVocal,
     },
   });
 

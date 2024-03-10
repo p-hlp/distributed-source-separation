@@ -6,6 +6,7 @@ export interface FileInfoResponse {
   parentName: string | undefined;
   hasMidi: boolean;
   hasTranscription: boolean;
+  isVocal: boolean;
   createdAt: string;
   updatedAt: string;
 }

@@ -77,6 +77,7 @@ const FileInfoSchema = z.object({
   libraryName: z.string(),
   parentName: z.string().nullable(),
   hasMidi: z.boolean(),
+  isVocal: z.boolean(),
   hasTranscription: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),

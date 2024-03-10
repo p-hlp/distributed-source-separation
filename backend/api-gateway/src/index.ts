@@ -253,6 +253,7 @@ const startUp = async () => {
       parentName: audioFile.parent?.name || "Unknown",
       hasMidi: Boolean(audioFile.midiFile),
       hasTranscription: Boolean(audioFile.transcription),
+      isVocal: Boolean(audioFile.isVocal),
       createdAt: audioFile.createdAt.toISOString(),
       updatedAt: audioFile.updatedAt.toISOString(),
     };

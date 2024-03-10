@@ -54,6 +54,7 @@ export const FileDetails = () => {
               title="Has Transcription"
               value={fileInfo.hasTranscription.toString()}
             />
+            <InfoItem title="Is Vocal" value={fileInfo.isVocal.toString()} />
             <InfoItem
               title="Created At"
               value={formatIsoDate(fileInfo.createdAt)}
