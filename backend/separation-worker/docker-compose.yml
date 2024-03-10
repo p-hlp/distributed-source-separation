@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  separation-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        database_url: ${DATABASE_URL} 
+    environment:
+      - MODELS_DIR=${MODELS_DIR}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_PORT=${MINIO_PORT}
+      - MINIO_DEFAULT_BUCKET=${MINIO_DEFAULT_BUCKET}
+      - DATABASE_URL=${DATABASE_URL}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - ./models:/models # Mount the models directory
+    networks:
+      - shared
+networks:
+  shared:
+    external: true
