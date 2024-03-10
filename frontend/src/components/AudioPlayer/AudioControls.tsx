@@ -6,7 +6,6 @@ import {
 } from "@mui/icons-material";
 import { Box, Checkbox, IconButton, Stack } from "@mui/material";
 import { FastForwardIcon, FastRewindIcon, PlayPauseIcon } from "../Icons";
-import { AddMarkerIcon } from "../Icons/AddMarkerIcon";
 import { AddRegionIcon } from "../Icons/AddRegionIcon";
 import { VolumeControl } from "./VolumeControl";
 import { ZoomControl } from "./ZoomControl";
@@ -47,9 +46,9 @@ export const AudioControls = (props: AudioControlsProps) => {
           zoomRange={zoomRange}
           onZoomChange={props.onZoom}
         />
-        <IconButton onClick={props.onAddMarker}>
+        {/* <IconButton onClick={props.onAddMarker}>
           <AddMarkerIcon />
-        </IconButton>
+        </IconButton> */}
         <IconButton onClick={props.onAddRegion}>
           <AddRegionIcon />
         </IconButton>
