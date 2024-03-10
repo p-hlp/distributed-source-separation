@@ -2,6 +2,8 @@
 
 ### Prerequisites
 
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- [Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html)/[Miniconda](https://docs.anaconda.com/free/miniconda/index.html) - Miniconda is prefered due to it's small footprint
 - [Docker Engine](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/)
 

@@ -64,7 +64,8 @@ For developers:
 
 ## System Components and Architecture
 
-- [Architecture and Data Flow](./ARCHITECTURE.md)
+### Components
+
 - [Web-Client](frontend/README.md)
 - [Backend](backend/README.md)
 
@@ -73,13 +74,17 @@ For developers:
   - [Audio To Midi Worker](backend/audio-to-midi-worker/README.md)
   - [Transcription Worker](backend/transcription-worker/README.md)
 
+### Architecture Overview
+
+![Architecture Overview](docs/assets/Architecture.svg)
+
 ## How to get started
 
 Check out the [USAGE](./USAGE.md) section for everything you need to get started.
 
 ## Update History
 
-As this isn't really a product ready for use there are no official changelogs. See [commit history](https://github.com/p-hlp/distributed-source-separation/commits).
+As this isn't really a product ready for use there are no official changelogs. See [commit history](https://github.com/p-hlp/distributed-source-separation/commits) for recent changes.
 
 ## Links
 
