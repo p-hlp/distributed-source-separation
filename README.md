@@ -19,8 +19,10 @@
 For music professionals, audio engineers and hobbyist:
 
 - Sampling has been a big part in music production for decades
-- Provide easy access to stems and samples of existing music for creative purposes
 - To explore and deconstruct musical pieces
+  - Remix tracks easily by separating music into its individual parts
+  - Expand your sample library by slicing stems further into samples
+  - Understand the meaning of a song by transcribing vocals
 - A central place for managing music and samples
 
 For developers:
@@ -32,7 +34,7 @@ For developers:
   - neural networks deployment / usage in an actual application
   - distributed systems dealing with audio processing
 - Offer easy to extend platform for experimentation with neural networks
-  - add an endpoint, a task queue and a worker
+  - create an endpoint, a task queue and a worker to easily add additional processing tasks
 - Learn to deal with long-running tasks
 - Experiment with [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
 
@@ -60,58 +62,25 @@ For developers:
   - Extraction is done asynchronously
   - Using [OpenAI Whisper](https://github.com/openai/whisper) or one of the several other open-source models
 
-## System Components
+## System Components and Architecture
 
-- [Frontend](frontend/README.md)
+- [Architecture and Data Flow](./ARCHITECTURE.md)
+- [Web-Client](frontend/README.md)
 - [Backend](backend/README.md)
+
   - [API-Gateway](backend/api-gateway/README.md)
   - [Separation Worker](backend/separation-worker/README.md)
   - [Audio To Midi Worker](backend/audio-to-midi-worker/README.md)
   - [Transcription Worker](backend/transcription-worker/README.md)
 
-## Architecture / Technologies Used
+## How to get started
 
-![Architecture Overview](docs/assets/Architecture.svg)
+Check out the [USAGE](./USAGE.md) section for everything you need to get started.
 
-- Web-Client (React/Typescript)
-- Identity-Provider / Authentication (Auth0)
-- Backend
-  - Information Flow: Client -> HTTP -> Gateway -> MQ -> Worker -> MQ -> Gateway -> SSE -> Client
-  - API Gateway: NodeJs + Express
-  - Message Broker: Redis
-  - Services / Workers:
-    - Separation-Worker (Demucs)
-    - Audio-To-Midi-Worker (Basic-Pitch)
-    - Transcription-Worker (OpenAI Whsiper)
-  - Object-Storage: Minio / S3
-  - Database: Postgres (+Prisma ORM)
+## Update History
 
-## How to run
+As this isn't really a product ready for use there are no official changelogs. See [commit history](/commits).
 
-### Prerequisites
+## Links
 
-- [Docker Engine](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/)
-
-### Running workers with GPU acceleration (CUDA)
-
-Direct:
-
-Run locally by starting workers directly.
-
-Containerized:
-
-- [NVIDIA GPU Drivers](https://docs.nvidia.com/datacenter/tesla/tesla-installation-notes/index.html)
-- [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-container-toolkit)
-
-### Running workers with GPU acceleration (MacOs - Metal API)
-
-Direct:
-
-Run locally by starting workers directly.
-
-Containerized:
-
-There's currently no way to run this application containerized with GPU acceleration on arm macs.
-
-### Running workers on CPU
+- Demo Video TBD.
