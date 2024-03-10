@@ -62,7 +62,7 @@ class Processor:
             userId = job.data["userId"]
 
             audio_file = await self.prisma.audiofile.find_first(
-                where={"id": audioFileId, "userId": userId}
+                where={"id": audioFileId, "userId": userId}, include={"midiFile": True}
             )
 
             print(f"Found audio file: {audio_file.name}, processing...")
@@ -70,6 +70,17 @@ class Processor:
             if audio_file is None:
                 print("Audio file not found")
                 raise Exception("Audio file not found")
+
+            # Check if the audio file has already been processed
+            if audio_file.midiFile is not None:
+                print("Audio file already processed")
+                await self.disconnect_from_db()
+                result = {
+                    "userId": userId,
+                    "audioFileId": audioFileId,
+                    "status": "done",
+                }
+                return result
 
             # Get the audio file from Minio
             file_path = audio_file.filePath
