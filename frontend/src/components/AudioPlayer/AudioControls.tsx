@@ -77,7 +77,10 @@ export const AudioControls = (props: AudioControlsProps) => {
         alignItems="center"
         pr={1}
       >
-        <LoopCheckBox />
+        {/* <LoopCheckBox
+          isLooping={props.isLooping}
+          onLoopChange={props.onLoopChange}
+        /> */}
       </Box>
       <VolumeControl
         initVolume={props.initVolume}
@@ -92,8 +95,14 @@ interface LoopCheckBoxProps {
   onLoopChange: (isLooping: boolean) => void;
 }
 
-const LoopCheckBox = () => {
+const LoopCheckBox = ({ isLooping, onLoopChange }: LoopCheckBoxProps) => {
   return (
-    <Checkbox color="default" icon={<Repeat />} checkedIcon={<RepeatOn />} />
+    <Checkbox
+      color="default"
+      icon={<Repeat />}
+      checkedIcon={<RepeatOn />}
+      checked={isLooping}
+      onChange={(event) => onLoopChange?.(event.target.checked)}
+    />
   );
 };
