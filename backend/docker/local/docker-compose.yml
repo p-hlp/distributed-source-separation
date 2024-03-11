@@ -33,33 +33,6 @@ services:
       - ~/postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-  # separation-worker-1:
-  #   build:
-  #     context: ../../separation-worker
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "5999:5999" # Adjust port as necessary
-  #   depends_on:
-  #     - redis
-  #     - minio
-  #     - postgres
-  #   environment:
-  #     MODELS_DIR: ${MODELS_DIR}
-  #     REDIS_HOST: ${REDIS_HOST}
-  #     REDIS_PORT: ${REDIS_PORT}
-  #     MINIO_ENDPOINT: ${MINIO_ENDPOINT}
-  #     MINIO_PORT: ${MINIO_PORT}
-  #     MINIO_DEFAULT_BUCKET: ${MINIO_DEFAULT_BUCKET}
-  #     MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-  #     MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-  #     DATABASE_URL: ${DATABASE_URL}
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
 volumes:
   redis-data:
   minio_data:
