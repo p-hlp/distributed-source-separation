@@ -18,12 +18,15 @@ sudo apt-get update
 sudo apt-get install audiowaveform
 ```
 
+For further audio processing [FFmpeg](https://ffmpeg.org/) is used, make sure to install the dependencies outlined in the [docs](https://github.com/fluent-ffmpeg/node-fluent-ffmpeg?tab=readme-ov-file#ffmpeg-and-ffprobe)
+
 ## First start
 
 1. `yarn install`
 2. add `.env` file and copy over the template from `.env.template`
-3. `npx prisma db push` to create the `audio_db` table from current prisma schema
-4. `npx prisma generate` to generate the prisma client
-5. `yarn dev`
+3. add relavant secrets to `.env` file. **DON'T COMMIT THIS**
+4. `npx prisma db push` to create the `audio_db` table from current prisma schema
+5. `npx prisma generate` to generate the prisma client
+6. `yarn dev`
 
 Generally its good practise to use `npx prisma db pull` and `npx prisma generate` when you suspect the schema of the db has changed in a previous commit.
