@@ -8,6 +8,8 @@ tbd
 
 # Running locally
 
+## Prerequisites
+
 One of the dependencies is [audiowaveform](https://github.com/bbc/audiowaveform), which handles calculating a downsampled representation of an uploaded audio file. For installation refer to their [installation guide](https://github.com/bbc/audiowaveform?tab=readme-ov-file#installation) or if using ubuntu do:
 
 ```bash
@@ -24,7 +26,19 @@ brew install sound-touch
 
 For Linux you can install `PySoundFile` as torchaudio backend later.
 
+## First start
+
 Install conda/miniconda if you haven't already.
+
+### Using conda environment file
+
+You can use the provided `environment.yml` file to get started fast.
+
+```bash
+conda env create -f environment.yml
+```
+
+### Manually Installing dependencies
 
 Create a new conda environment with `python=3.10` or version of you liking.
 
@@ -59,6 +73,8 @@ Additionally for linux:
 pip install PySoundFile
 ```
 
+### Generating the prisma client
+
 Generate prisma client, api-gateway should've been started by now and a db should exist:
 
 ```bash
@@ -66,7 +82,7 @@ prisma db pull
 prisma generate
 ```
 
-## First start
+Then copy `.env.template` to `.env` and fill out the needed env vars with your secrets.
 
 Start the worker with `python worker.py`, you will see whether any GPU is for accelerated computing is available and the model downloading from meta's public file registry.
 
