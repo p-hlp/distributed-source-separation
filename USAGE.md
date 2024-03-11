@@ -47,7 +47,7 @@
 
 ## Continuing on
 
-Check out the documentation for the individual components system components:
+Check out the documentation for the individual system components:
 
 - [Web-Client](frontend/README.md)
 - [Backend](backend/README.md)

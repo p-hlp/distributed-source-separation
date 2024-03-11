@@ -1,4 +1,4 @@
-# Backend
+# Intelligent Sampling and Source Separation - Backend
 
 NeuraLib's backend is designed to handle distributed sample management and processing efficiently, leveraging modern technologies and frameworks to ensure scalability and performance. More detailed informations for each component can be found in the related docs, just click the links.
 
@@ -31,3 +31,12 @@ NeuraLib's backend is designed to handle distributed sample management and proce
 
 - Object Storage: [Minio](https://min.io/) (drop-in replacement for Amazon S3), used for storing large audio files and other binary data.
 - Database: [PostgreSQL](https://www.postgresql.org/), ensures reliable storage and management of application data. [Prisma](https://www.prisma.io/) ORM for easy interfacing with postgres.
+
+## Getting started
+
+For the api-gateway and the workers to be able to access/persist data we need to setup redis, minio and postgres. A docker compose setup is provided to easily do this.
+
+1. Go to `backend/docker/local`
+2. Copy `env.local.template` to `.env.local` and fill out the env vars with your secrets
+3. If you are on unix systems, set permission for the `localUp.sh` shell script with `sudo chmod +x ./localUp.sh`
+4. Run `./localUp.sh` to pull up the containers

@@ -30,3 +30,5 @@ For further audio processing [FFmpeg](https://ffmpeg.org/) is used, make sure to
 6. `yarn dev`
 
 Generally its good practise to use `npx prisma db pull` and `npx prisma generate` when you suspect the schema of the db has changed in a previous commit.
+
+With `npx prisma studio` you can easily start a small application that provides a UI for looking at your postgresql db.
