@@ -78,6 +78,10 @@ For developers:
 
 ![Architecture Overview](docs/assets/Architecture.svg)
 
+### Authentication/Authoriziation
+
+This application uses [Auth0](https://auth0.com/) as an identity provider and general authentication/authorization platform. See [AUTHENTICATION](./AUTHENTICATION.md) for further information about the used authorization code flow.
+
 ## How to get started
 
 Check out the [USAGE](./USAGE.md) section for everything you need to get started.
