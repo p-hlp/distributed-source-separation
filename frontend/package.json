@@ -24,7 +24,7 @@
     "@tanstack/router-vite-plugin": "1.16.5",
     "@types/humanize-duration": "3.27.4",
     "@uidotdev/usehooks": "2.4.1",
-    "@wavesurfer/react": "1.0.4",
+    "@wavesurfer/react": "1.0.6",
     "axios": "1.6.7",
     "humanize-duration": "3.31.0",
     "mui-file-input": "4.0.4",
