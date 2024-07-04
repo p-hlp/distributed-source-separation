@@ -1075,10 +1075,10 @@
     "@types/babel__core" "^7.20.5"
     react-refresh "^0.14.0"
 
-"@wavesurfer/react@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@wavesurfer/react/-/react-1.0.4.tgz#577bf84152bd25bd7ba6635a5b1694a57e6f6161"
-  integrity sha512-6WkXLhh0EaytyK1B6JqHZmzHQlBz+nbGH5x009tUH6nUIFFXq7zwkDEXqeZuWyVTKgjqcOQGOgavSZ7EbsS6lA==
+"@wavesurfer/react@1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@wavesurfer/react/-/react-1.0.7.tgz#5bbb8fe8080f4478e896a32eeeb5ed111bbc4266"
+  integrity sha512-Bw2rd2zqVL1ERy8N9mciacbQW3N5Gn9oRjhq3kjqgtLeE8a1WSTU+4kU0E37541jf432eNZ8lNzuodFFSiNccw==
 
 acorn-jsx@^5.3.2:
   version "5.3.2"
