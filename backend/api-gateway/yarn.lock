@@ -363,12 +363,13 @@ asynckit@^0.4.0:
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
   integrity sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==
 
-auth0@4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/auth0/-/auth0-4.3.1.tgz#7f91e3a4b9af6c5d9004b25025deb014fb0ed067"
-  integrity sha512-VuR/PdNHwXD9QiYUZf8UN0qiv07yJWHKfF2yEhePaPCrpwbEm6lHM6dkN7ylOdseogCkGmvchxYGMga0IPNrCA==
+auth0@4.10.0:
+  version "4.10.0"
+  resolved "https://registry.yarnpkg.com/auth0/-/auth0-4.10.0.tgz#c4af01f77f0eb8022fe774a488b78cd8de60780f"
+  integrity sha512-xfNtSyL84w9z1DQXWV1GXgtq2Oi3OXeJe/r+pI29GKZHpfgspNb4rFqp/CqI8zKVir6L3Iq2KZgE2rDHRDtxfA==
   dependencies:
     jose "^4.13.2"
+    undici-types "^6.15.0"
     uuid "^9.0.0"
 
 available-typed-arrays@^1.0.6:
@@ -1880,6 +1881,11 @@ undefsafe@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.5.tgz#38733b9327bdcd226db889fb723a6efd162e6e2c"
   integrity sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==
+
+undici-types@^6.15.0:
+  version "6.19.8"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
+  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 undici-types@~5.26.4:
   version "5.26.5"
